@@ -16,7 +16,7 @@ import { makeStyles } from "@material-ui/core"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router"
 import { useEffect } from "react"
-import { Grid } from "@mui/material"
+import { Grid, Box } from "@mui/material"
 import { grey } from "@mui/material/colors"
 
 
@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme=>({
 }))
 
 
-    const Signin = () => {
+    const Login = () => {
     
         const classes = useStyles()
        // const userSigninData = useSelector(getUserSigninData)
@@ -121,7 +121,7 @@ const useStyles = makeStyles(theme=>({
         return(
 
         <Grid container className={classes.container}>
-            <Card className={classes.card}>
+            <Box className={classes.card}>
 
             <Typography variant='h4' className={classes.title}>
                    Log into your account
@@ -167,10 +167,10 @@ const useStyles = makeStyles(theme=>({
                 </Button>
             </CardActions>
             
-        </Card>
+        </Box>
         </Grid>
         )
     
     }
 
-export default Signin
+export default Login

@@ -2,25 +2,22 @@ import React from "react";
 import AppBar  from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Item from '@mui/material/Grid'
-import MenuItem from '@mui/material/MenuItem';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 // import {signoutUser, 
 //         getUserSigninData,
 //         cleanStore,
 //         getUserDataToDisplay} from "../../features/usersSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import { Typography } from "@mui/material";
+
 import { Grid, makeStyles } from "@material-ui/core";
 import { Box } from "@mui/material";
-import { useSelector } from "react-redux";
-import dateFormat from "dateformat";
 import { styled, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
+
 import Menu from '@mui/material/Menu';
 import { useState } from "react";
 import Logo from '../assets/images/logo.jpeg'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faUser}  from '@fortawesome/free-solid-svg-icons'
 
 const StyledMenu = styled((props) => (
     <Menu
@@ -83,6 +80,11 @@ const useStyles = makeStyles(theme=>({
       color:'white',
       fontWeight:'bold',
       fontSize:'14px'
+    },
+    userIcon:{
+      fontSize:'60px',
+      marginTop:'10px',
+      color:'black'
     }
     
 }))
@@ -92,6 +94,7 @@ const Header = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [signedIn, setSignedIn] = useState(true)
   //const userData = useSelector(getUserSigninData)
   //const displayUserName = useSelector(getUserDataToDisplay)
 
@@ -131,8 +134,19 @@ const Header = () => {
     const login = () => {
       //dispatch(signoutUser())
       //dispatch(cleanStore())
-      navigate('/signin')
+      navigate('/login')
+    }
+
+    const signup = () => {
+      //dispatch(signoutUser())
+      //dispatch(cleanStore())
+      navigate('/signup')
   }
+
+  const userProfile = () => {
+    navigate('/userProfile')
+  }
+
     return(
         
     <AppBar position="static" className={classes.header}>
@@ -154,14 +168,26 @@ const Header = () => {
           </Item>
           </Grid> 
 
-          <Grid item xs={12} md={3} lg={3} xl={3} className={classes.rightButtons}>
-          <Item>
-          
-              <button className={classes.button} onClick={()=>navigate('/tutorial')}>How it works</button>
-              <button  className={classes.button}>Sign Up</button>
-              <button  className={classes.button} onClick={()=>login()}>Log In</button>
-        
-          </Item>
+          <Grid item xs={12} md={3} lg={3} xl={3} 
+          className={classes.rightButtons}>
+            <Item>
+            
+              {
+              signedIn ? <FontAwesomeIcon 
+              onClick={()=>navigate('/userProfile')}
+              icon={faUser} 
+              className={classes.userIcon}
+              />
+              :(<>
+              <button style={{color: window.location.pathname ==='/tutorial' ? 'grey' : 'white'}}
+                className={classes.button} onClick={()=>navigate('/tutorial')}>How it works</button>
+                <button  style={{color: window.location.pathname ==='/signup' ? 'grey' : 'white'}}
+                className={classes.button} onClick={()=>signup()}>Sign Up</button>
+                <button style={{color: window.location.pathname ==='/login' ? 'grey' : 'white'}} 
+                className={classes.button} onClick={()=>login()}>Log In</button>
+                </>)
+              } 
+            </Item>
           </Grid>
 
         </Toolbar>
