@@ -7,12 +7,7 @@ import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
 import Icon from "@material-ui/core/Icon"
 import { makeStyles } from "@material-ui/core"
-// import { signinUser, 
-//             getUserSigninData, 
-//             userToken, 
-//             getUserToken, 
-//             fetchUserTransactions,
-//             userDataToDisplay} from "../features/usersSlice"
+import { loginUser, getUserSigninData, fetchUserProfile, fetchFiles} from "../features/meditationSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router"
 import { useEffect } from "react"
@@ -37,13 +32,6 @@ const useStyles = makeStyles(theme=>({
         marginTop: theme.spacing(5),
         paddingBottom: theme.spacing(2),
         backgroundColor:'#a2c3c8',
-        marginBottom:'25%',
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'12%',
-        },
-        [theme.breakpoints.only('xs')]:{
-            marginBottom:'48%',
-        }
     },
     error: {
         verticalAlign: 'middle'
@@ -80,25 +68,23 @@ const useStyles = makeStyles(theme=>({
     const Login = () => {
     
         const classes = useStyles()
-       // const userSigninData = useSelector(getUserSigninData)
         const dispatch = useDispatch()
         const navigate = useNavigate()
-        //const token = useSelector(getUserToken)
+        const userSigninData = useSelector(getUserSigninData)
+        
         const [values, setValues] = useState({
             email:'',
             password:'',
         })
     
         //if user has token (is logged) redirected to protected page
-        // useEffect(()=>{
-        //     if(userSigninData.hasOwnProperty("token")){
-        //         dispatch(fetchUserTransactions())
-        //         dispatch(userDataToDisplay({user:userSigninData.user}))
-        //         dispatch(userToken())
-        //         navigate('/dashboard')
-        //     }
-            
-        // },[userSigninData])
+        useEffect(()=>{
+            if(userSigninData.hasOwnProperty('token')){
+              dispatch(fetchUserProfile(userSigninData.user._id))
+              dispatch(fetchFiles())
+              navigate('/musicLibrary')
+            }
+          },[userSigninData])
     
         // send request to server to login user and in case there are errors collect error
         const clickSubmit = () => {
@@ -106,7 +92,7 @@ const useStyles = makeStyles(theme=>({
                 email: values.email || undefined,
                 password: values.password || undefined
             }
-            //dispatch(signinUser(user))    
+            dispatch(loginUser(user))    
         }
     
         // get values from input fields
@@ -120,54 +106,78 @@ const useStyles = makeStyles(theme=>({
     
         return(
 
-        <Grid container className={classes.container}>
+        <Grid container>
             <Box className={classes.card}>
 
-            <Typography variant='h4' className={classes.title}>
-                   Log into your account
-                </Typography>
-    
-                <CardContent>
-                    <Typography variant='h6' className={classes.tittle}>Sign In</Typography>
-    
-                    <TextField id="email" type='email' label="Email" className={classes.textField}
-                    value={values.email} onChange={handleChange('email')} margin="normal" />
-                    <br />
-    
-                    <TextField id="password" type='password' label="Password" className={classes.textField}
-                    value={values.password} onChange={handleChange('password')} margin="normal" />
-                    <br />
-                    {/* { //display error returned from server
-                        Object.keys(userSigninData).length !== 0 && (
-                            <Typography component='p' color='error'>
-                                <Icon color='error' className={classes.error}></Icon>
-                                {userSigninData.error}
-                            </Typography>
-                        )
-                    } */}
-    
-                </CardContent>
-    
-            <CardActions>
-                <Button variant="contained" onClick={clickSubmit}
-                className={classes.submit}>Login</Button>
-            </CardActions>
+                    <Typography 
+                    variant='h4' 
+                    className={classes.title}>
+                        Log into your account
+                    </Typography>
+        
+                    <CardContent>
+                        <Typography 
+                        variant='h6' 
+                        className={classes.tittle}>
+                            Sign In
+                        </Typography>
+        
+                        <TextField 
+                        id="email" 
+                        type='email' 
+                        label="Email" 
+                        className={classes.textField}
+                        value={values.email} 
+                        onChange={handleChange('email')} 
+                        margin="normal" />
+                        <br />
+        
+                        <TextField 
+                        id="password" 
+                        type='password' 
+                        label="Password" 
+                        className={classes.textField}
+                        value={values.password} 
+                        onChange={handleChange('password')} 
+                        margin="normal" />
+                        <br />
 
-            <CardActions>
-            <Typography component='p' className={classes.noaccount}>
-                    or
-                </Typography>
-            </CardActions>
+                        { //display error returned from server
+                            userSigninData?.error && (
+                                <Typography component='p' color='error'>
+                                    <Icon color='error' className={classes.error}></Icon>
+                                    {userSigninData.error}
+                                </Typography>
+                            )
+                        }
+        
+                    </CardContent>
+        
+                <CardActions>
+                    <Button 
+                    variant="contained" 
+                    onClick={clickSubmit}
+                    className={classes.submit}>
+                        Login
+                    </Button>
+                </CardActions>
 
-            <CardActions>
-                
+                <CardActions>
+                    <Typography 
+                    component='p' 
+                    className={classes.noaccount}>
+                        or
+                    </Typography>
+                </CardActions>
 
-            <Button className={classes.submit} color='primary' variant="contained" onClick={clickSubmit}>
-                    Sign in with Facebook
-                </Button>
-            </CardActions>
+                <CardActions>
+                    <Button className={classes.submit} color='primary' variant="contained" onClick={clickSubmit}>
+                        Sign in with Facebook
+                    </Button>
+                </CardActions>
             
-        </Box>
+            </Box>
+
         </Grid>
         )
     

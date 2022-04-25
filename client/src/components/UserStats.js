@@ -8,22 +8,12 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from "react-router-dom"
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSliders, faGlasses, faClock, faTrophy} from '@fortawesome/free-solid-svg-icons'
+import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme=>({
-    container: {
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        top:'0',
-        left:'0',
-        right:'0',
-        overflow:'none',
-        [theme.breakpoints.only('md')]:{
-            height:'535px',
-        },
-        [theme.breakpoints.only('lg')]:{
-            height:'736px',
-        } 
-    },
     userStats:{
         color:'white',
         fontWeight:'bold',
@@ -33,46 +23,48 @@ const useStyles = makeStyles(theme=>({
         backgroundColor:'#a2c3c8',
         textTransform:'none',
         marginTop:'20px',
-        marginBottom:'20px',
-        [theme.breakpoints.only('md')]:{
-            fontSize:'20px',
-            marginBottom:'0'
-        }   
+   
     },
     winIcon:{
         marginBottom:'10px',
         fontSize:'80px',
+        textAlign:'center',
         [theme.breakpoints.only('md')]:{
             fontSize:'50px'
         } 
     },
     statIcons:{
-        fontSize:'80px',
-        [theme.breakpoints.only('md')]:{
-            fontSize:'50px'
-        } 
+        fontSize:'80px', 
+        marginTop:'40px'
     },
     stats:{
         fontWeight:'900',
         color:'black',
-        paddingTop:'10px'
+        paddingTop:'10px',
+        textAlign:'center',
     },
-    mainStats:{
-        marginBottom:'120px',
-        [theme.breakpoints.only('xl')]:{
-            marginBottom:'283px'
-        },
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'60px'
-        }
+    container:{
+        textAlign:'center'
     }
-
 
 }))
 const UserStats = () => {
 
     const classes = useStyles()
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const token = useSelector(getUserToken)
+    
+    useEffect(()=>{
+            //check if user token exists. 
+           dispatch(userToken())
+            //redirect user in case token doesn't exist
+            if(token === 'Request failed with status code 500'
+            || token ==='Request failed with status code 401'){
+            dispatch(resetStore())
+            navigate('/') 
+            }
+        },[token.length])
    
     return(
         <Grid container className={classes.container} justifyContent='center'>
@@ -92,20 +84,25 @@ const UserStats = () => {
                 </Item>
 
                 <Item className={classes.mainStats}>
+                    
                     <Typography 
                     variant="h4" 
                     className={classes.stats}>
                         DAY STREAK
                     </Typography>
+
                     <Typography 
                     variant="h3" 
                     className={classes.stats}>
                         1
                     </Typography>
+
                 </Item>
             </Grid>
 
-            <Grid container justifyContent='space-around' style={{marginBottom:'201px'}}>
+            <Grid 
+            container 
+            justifyContent='center'>
             
                 <Grid item xs={12} md={4} lg={4} xl={4}> 
                     <Item>
@@ -115,56 +112,69 @@ const UserStats = () => {
                     </Item>
 
                     <Item>
+
                         <Typography 
-                        variant="h4" 
-                        className={classes.stats}>
+                            variant="h4" 
+                            className={classes.stats}>
                             LONGEST STREAK
                         </Typography>
+
                         <Typography 
                         variant="h3" 
                         className={classes.stats}>
                             1
                         </Typography>
+
                     </Item>
                 </Grid>
         
                 <Grid item xs={12} md={4} lg={4} xl={4}>
+                    <Item >
+                        <FontAwesomeIcon 
+                        icon={faGlasses} 
+                        className={classes.statIcons}
+                         />
+                    </Item>
+                    
                     <Item>
-                        <FontAwesomeIcon icon={faGlasses} className={classes.statIcons} />
+
+                        <Typography 
+                        variant="h4" 
+                        className={classes.stats}>
+                            TOTAL COMPLETED SESSIONS
+                        </Typography>
+
+                        <Typography 
+                        variant="h3" 
+                        className={classes.stats}>
+                            1
+                        </Typography>
+
+                    </Item>
+                </Grid>
+
+                <Grid item xs={12} md={4} lg={4} xl={4}>
+                    
+                    <Item>
+                        <FontAwesomeIcon 
+                        icon={faClock} 
+                        className={classes.statIcons}/>
                     </Item>
                     
                     <Item>
                         <Typography 
                         variant="h4" 
                         className={classes.stats}>
-                            TOTAL SESSION
-                        </Typography>
-                        <Typography 
-                        variant="h3" 
-                        className={classes.stats}>
-                            1
-                        </Typography>
-                    </Item>
-                </Grid>
-
-                <Grid item xs={12} md={4} lg={4} xl={4}>
-                    <Item>
-                        <FontAwesomeIcon 
-                        icon={faClock} 
-                        className={classes.statIcons}/>
-                    </Item>
-                    <Item>
-                        <Typography 
-                        variant="h4" 
-                        className={classes.stats}>
                             MINDFUL MINUTES
                         </Typography>
+                        
                         <Typography 
                         variant="h3" 
                         className={classes.stats}>
                             3m
                         </Typography>
                     </Item>
+                
                 </Grid>   
             
             </Grid>

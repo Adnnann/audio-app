@@ -18,18 +18,7 @@ const useStyles = makeStyles(theme=>({
     },
     feature2:{
         paddingTop:'50px',
-        textAlign:'justifY',
-       
-    },
-    welcomePageTitle:{
-        marginTop:'20px',
-        paddingTop:'20px',
-        paddingBottom:'20px',
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        position:'fixed',
-        left:'0',
-        right:'0'
+        textAlign:'justifY',  
     },
     image1:{
         marginTop:'50px',
@@ -43,7 +32,8 @@ const useStyles = makeStyles(theme=>({
             marginLeft:'2px',
             marginTop:'50px',
             marginBottom:'0',
-            maxWidth:'200px'
+            width:'200px',
+            height:'200px'
         },
     },
     image2:{
@@ -60,7 +50,8 @@ const useStyles = makeStyles(theme=>({
             marginRight:'2px',
             marginTop:'50px',
             marginBottom:'0',
-            maxWidth:'200px'
+            width:'200px',
+            height:'200px'
         },
     },
      

@@ -13,17 +13,12 @@ import Item from "@material-ui/core/Grid"
 import { makeStyles } from "@material-ui/core"
 import { Typography } from "@mui/material"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 
 const useStyles = makeStyles(theme=>({
-    container: {
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        top:'0',
-        left:'0',
-        right:'0',
-        overflow:'none'
-    },
     card: {
         borderStyle:'none',
         maxWidth: 620,
@@ -32,13 +27,6 @@ const useStyles = makeStyles(theme=>({
         marginTop: theme.spacing(5),
         paddingBottom: theme.spacing(2),
         backgroundColor:'#a2c3c8',
-        marginBottom:'28%',
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'15%',
-        },
-        [theme.breakpoints.only('xs')]:{
-            marginBottom:'61%',
-        }
     },
     error:{
         verticalAlign:'middle',
@@ -52,7 +40,10 @@ const useStyles = makeStyles(theme=>({
     textField:{
         marginLeft: theme.spacing(1),
         marginRight:theme.spacing(1),
-        width:300
+        width:300,
+        [theme.breakpoints.only('xs')]:{
+            width:220
+        }
     },
     submit:{
         marginLeft: theme.spacing(1),
@@ -64,33 +55,6 @@ const useStyles = makeStyles(theme=>({
         paddingLeft:'30px',
         backgroundColor:'grey',
         textTransform:'none'
-    },
-    trackLibrary:{
-        
-        textTransform:'none',
-        backgroundColor:'white',
-        color:'black',
-        minWidth:'220px',
-        minHeight:'50px',
-        marginBottom:'10px',
-        marginLeft: '900px',
-        [theme.breakpoints.only('lg')]:{
-            marginLeft:'600px',
-        },
-        [theme.breakpoints.only('md')]:{
-            marginLeft:'500px',
-        },
-        [theme.breakpoints.only('xs')]:{
-            marginLeft:'0px',
-        }
-    },
-    hasAccount:{
-        margin: '0 auto',
-        marginBottom: theme.spacing(1)
-    },
-    signin:{
-        margin: 'auto',
-        marginBottom: theme.spacing(1),
     },
     edit:{
         marginTop:'35px'
@@ -110,6 +74,8 @@ const useStyles = makeStyles(theme=>({
 }))
 const AccountDetails = () => {
 
+    const dispatch = useDispatch()
+    const token = useSelector(getUserToken)
     const classes = useStyles()
     const navigate = useNavigate()
     const [values, setValues] = useState({
@@ -121,6 +87,18 @@ const AccountDetails = () => {
         username: false,
         email:false
     })
+
+    useEffect(()=>{
+        //check if user token exists. 
+        dispatch(userToken())
+        //redirect user in case token doesn't exist
+        if(token === 'Request failed with status code 500'
+        || token ==='Request failed with status code 401'){
+        dispatch(resetStore())
+        navigate('/') 
+        }
+
+    },[token.length])
 
     const clickSubmit = () => {
         const user = {
@@ -137,7 +115,7 @@ const AccountDetails = () => {
 
     return(
 
-        <Grid container className={classes.container}>
+        <Grid container>
 
         <Box className={classes.card}>
 
@@ -147,7 +125,11 @@ const AccountDetails = () => {
             </Button>
     
                 <CardContent>
-                    <Typography variant='h6' className={classes.tittle}>Sign In</Typography>
+                    <Typography 
+                    variant='h6' 
+                    className={classes.tittle}>
+                        Sign In
+                    </Typography>
     
                     <TextField id="email" 
                     type='email' 
@@ -192,15 +174,17 @@ const AccountDetails = () => {
 
 
             <CardActions>
-
-            <Button disabled={editUserData.email || editUserData.username ? false : true}
-            className={classes.submit} color='primary' variant="contained" onClick={clickSubmit}>
+                <Button disabled={editUserData.email || editUserData.username ? false : true}
+                className={classes.submit} 
+                color='primary' 
+                variant="contained" 
+                onClick={clickSubmit}>
                     Update
                 </Button>
             </CardActions>
             
         </Box>
-        </Grid>
+    </Grid>
     )
 }
 

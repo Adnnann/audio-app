@@ -15,10 +15,20 @@ router.get('/protected', passport.authenticate('jwt', { session: false }),
     }
 )
 
+router.route('/api/users/')
+.post(userCtrl.create)
+
 router.route('/api/users/:userId')
 .get(userCtrl.read)
 .put(userCtrl.update)
 .delete(userCtrl.remove)
+
+router.route('/api/users/updateFavorite/:userId')
+.put(userCtrl.updateFavorite)
+
+router.route('/api/users/updateSessions/:userId')
+.put(userCtrl.updateSessions)
+
 
 router.param('userId', userCtrl.userByID)
 

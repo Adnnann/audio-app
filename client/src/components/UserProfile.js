@@ -8,6 +8,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router"
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ReplayIcon from "@mui/icons-material/Replay";
+import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { useSelector } from "react-redux"
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme=>({
     container: {
@@ -26,19 +29,6 @@ const useStyles = makeStyles(theme=>({
         marginTop: theme.spacing(5),
         paddingBottom: theme.spacing(2),
         backgroundColor:'#a2c3c8',
-        marginBottom:'25%',
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'106px',
-        },
-        [theme.breakpoints.only('xs')]:{
-            marginBottom:'48%',
-        },
-        [theme.breakpoints.only('lg')]:{
-            marginBottom:'306px',
-        },
-        [theme.breakpoints.only('xl')]:{
-            marginBottom:'583px',
-        }
     },
     tittle:{
         marginTop:theme.spacing(2),
@@ -92,31 +82,50 @@ const UserProfile = () =>{
     const classes = useStyles()
     //const userData = useSelector(getUser)
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const token = useSelector(getUserToken)
+    
+    useEffect(()=>{
+            //check if user token exists. 
+           dispatch(userToken())
+            //redirect user in case token doesn't exist
+            if(token === 'Request failed with status code 500'
+            || token ==='Request failed with status code 401'){
+            dispatch(resetStore())
+            navigate('/') 
+            }
+        },[token.length])
+    
+    
 
 
-    // useEffect(()=>{
-    //     if(closeAccountData.hasOwnProperty('message') || closeAccountData.hasOwnProperty('error') ){
-    //         dispatch(cleanStore())
-    //     }
-    // },[closeAccountData.message, closeAccountData.error])
-  
-   
+
+
     return(
-        <Grid container className={classes.container}>
+        <Grid container>
             
-            <Box className={classes.card}>
+            <Box 
+            className={classes.card}>
       
-            <Button startIcon={<ReplayIcon />} className={classes.trackLibrary}>Track library</Button>    
+            <Button 
+            startIcon={<ReplayIcon />} 
+            onClick={()=>navigate('/musicLibrary')}
+            className={classes.trackLibrary}>
+                Track library
+            </Button>    
                     
                     <Typography variant='h4' 
-                    className={classes.tittle}>Profile</Typography>
+                    className={classes.tittle}>
+                        Profile
+                    </Typography>
 
                     <Button 
                     endIcon={<ArrowForwardIosIcon 
                     onClick={()=>navigate('/accountDetails')}
                     className={classes.accountDetailsButtonIcon}/>} 
-                    className={classes.submit}
-                    >Account details</Button>
+                    className={classes.submit}>
+                        Account details
+                    </Button>
                     <br />
 
                     <Button 
@@ -124,7 +133,8 @@ const UserProfile = () =>{
                     className={classes.changePasswordButtonIcon} />} 
                     className={classes.submit}
                     onClick={()=>navigate('/changePassword')}>
-                    Change Password</Button>
+                        Change Password
+                    </Button>
                     <br />
 
                     <Button 
@@ -140,7 +150,9 @@ const UserProfile = () =>{
                     endIcon={<ArrowForwardIosIcon 
                     className={classes.logoutButtonIcon}/>} 
                     onClick={()=>navigate('/logout')}
-                    className={classes.submit}>Log Out</Button>
+                    className={classes.submit}>
+                        Log Out
+                    </Button>
                     <br />
 
            </Box>

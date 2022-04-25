@@ -1,16 +1,15 @@
 import mongoose from 'mongoose'
 import crypto from 'crypto'
+import validate from 'mongoose-validator'
+
+const emailValidate = [
+    validate({
+        validator:'isEmail',
+        message:'Please enter valid email address'
+    })
+]
 
 const UserSchema = new mongoose.Schema({
-    id:{
-        type:Number,  
-    },
-    name:{
-        type:String,
-        required:'Name is required',
-        trim: true,
-
-    },
     username:{
         type:String,
         required:'Username is required',
@@ -20,13 +19,21 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    role:{
-        type: String,
+    email:{
+        type:String,
+        validate: emailValidate
+
     },
     updated: Date,
     hashed_password:{
         type:String,
         required: 'Password is required'
+    },
+    favorites:{
+        type:Array
+    },
+    sessions:{
+        type:Array
     },
     salt:String
 })
@@ -63,8 +70,8 @@ UserSchema.methods = {
 }
 
 UserSchema.path('hashed_password').validate(function(v){
-    if(this._password && this._password.length < 6){
-        this.invalidate('password', 'Password must be at least 6 characters')
+    if(this._password && this._password.length < 8){
+        this.invalidate('password', 'Password must be at least 8 characters')
     }
 }, null)
 

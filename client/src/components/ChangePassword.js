@@ -15,16 +15,11 @@ import { useDispatch } from 'react-redux';
 //         cleanStore} from "../features/usersSlice"
 import { useNavigate } from "react-router"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { useSelector } from "react-redux"
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme=>({
-    container: {
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        top:'0',
-        left:'0',
-        right:'0',
-        overflow:'none'
-    },
     card: {
         borderStyle:'none',
         maxWidth: 620,
@@ -33,13 +28,6 @@ const useStyles = makeStyles(theme=>({
         marginTop: theme.spacing(5),
         paddingBottom: theme.spacing(2),
         backgroundColor:'#a2c3c8',
-        marginBottom:'25%',
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'12%',
-        },
-        [theme.breakpoints.only('xs')]:{
-            marginBottom:'48%',
-        }
     },
     error:{
         verticalAlign:'middle',
@@ -87,11 +75,24 @@ const useStyles = makeStyles(theme=>({
 
 }))
 const ChangePassword = () =>{
+    
     const classes = useStyles()
-    const dispatch = useDispatch()
-    //const userData = useSelector(getUser)
     const navigate = useNavigate()
-    //const closeAccountData = useSelector(getCloseAccountData)
+    const dispatch = useDispatch()
+    const token = useSelector(getUserToken)
+    
+    useEffect(()=>{
+        //check if user token exists. 
+       dispatch(userToken())
+        //redirect user in case token doesn't exist
+        if(token === 'Request failed with status code 500'
+        || token ==='Request failed with status code 401'){
+        dispatch(resetStore())
+        navigate('/') 
+        }
+    },[token.length])
+
+
     const [values, setValues] = useState({
         oldPassword:'',
         newPassword:'',
@@ -138,7 +139,7 @@ const ChangePassword = () =>{
         //dispatch(cleanRegisteredUserData())
     }
     return(
-        <Grid container className={classes.container}>
+        <Grid container>
             <Box className={classes.card}>
 
             <Button 

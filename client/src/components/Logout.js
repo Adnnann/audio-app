@@ -6,16 +6,10 @@ import Grid from "@material-ui/core/Grid"
 import { makeStyles } from "@material-ui/core"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import { resetStore, signoutUser } from "../features/meditationSlice"
 
 const useStyles = makeStyles(theme=>({
-    container: {
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        top:'0',
-        left:'0',
-        right:'0',
-        overflow:'none'
-    },
     card: {
         borderStyle:'none',
         maxWidth: 620,
@@ -24,18 +18,6 @@ const useStyles = makeStyles(theme=>({
         marginTop: theme.spacing(5),
         paddingBottom: theme.spacing(2),
         backgroundColor:'#a2c3c8',
-        [theme.breakpoints.only('xs')]:{
-            marginBottom:'425px',
-        },
-        [theme.breakpoints.only('md')]:{
-            marginBottom:'350px',
-        },
-        [theme.breakpoints.only('lg')]:{
-            marginBottom:'550px',
-        },
-        [theme.breakpoints.only('xl')]:{
-            marginBottom:'826px',
-        }
     },
     submit:{
         marginLeft: theme.spacing(1),
@@ -61,13 +43,16 @@ const Logout = () =>{
 
     const classes = useStyles()
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const logout = () => {
-
+        dispatch(signoutUser())
+        dispatch(resetStore())
+        navigate('/')
     }
 
     return(
-        <Grid container className={classes.container}>
+        <Grid container>
             <Box className={classes.card}>
 
             <Button 

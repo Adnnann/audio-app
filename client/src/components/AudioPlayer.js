@@ -4,39 +4,33 @@ import { useState } from "react";
 import ReplayIcon from "@mui/icons-material/Replay";
 import PlayCircleOutlinedIcon from "@mui/icons-material/PlayCircleOutlined";
 import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined";
-import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
 import VolumeDown from "@mui/icons-material/VolumeDown";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import VolumeOffOutlined from "@mui/icons-material/VolumeOffOutlined";
 import Slider from '@mui/material/Slider';
 import { useSelector } from "react-redux";
-import { getFile } from "../features/meditationSlice";
-import { Container, Typography } from "@material-ui/core";
+import {clearUserFavoriteList, 
+        fetchUserProfile,
+        getFile, 
+        getSessions, 
+        getUpdatedFavorite, 
+        getUserProfile, 
+        updateFavoriteList,
+        updateSessions,
+} from "../features/meditationSlice";
+import { Card, CardActions, CardMedia,  Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core"
 import Grid from "@material-ui/core/Grid"
 import Item from "@material-ui/core/Grid"
+import { getUserToken, userToken, resetStore, clearUserSessions } from "../features/meditationSlice"
+import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faHeart}  from '@fortawesome/free-solid-svg-icons'
+import _ from 'lodash'
 
 const useStyles = makeStyles(theme=>({
-    container:{
-      paddingRight:'10px',
-      paddingLeft:'10px',
-      paddingTop:'100px',
-      backgroundColor:'#a2c3c8',
-      left:'0',
-      right:'0',
-      bottom:'0',
-      top:'0',
-      [theme.breakpoints.only('xs')]:{
-        width:'400px',
-        height:'600px',
-        paddingTop:'30px',
-        overflowY:'unset'
-  
-      },
-      [theme.breakpoints.only('md')]:{
-        paddingTop:'30px',
-      }
-    },
     player:{
       paddingTop:'50px',
       paddingBottom:'10px',
@@ -44,21 +38,44 @@ const useStyles = makeStyles(theme=>({
       height:'500px',
       width:'500px',
       margin:'0 auto',
-      marginBottom:'68px',
-      [theme.breakpoints.only('xs')]:{
-        height:'250px',
-        width:'250px',
-        marginBottom:'0px',
-        paddingTop:'10px',
-        paddingBottom:'0px',
-      },
-      [theme.breakpoints.only('md')]:{
-        paddingBottom:'10px',
+    },
+    audioLenght:{
+      textAlign:'left',
+      textDecoration:'underline'
+    },
+    audioTimeAndProgress: {
+      width: "60%",
+      height: "5px",
+      borderRadius: "25px",
+      margin:'0 auto'
+    },
+    audioTime:{
+      display:'inline-flex'
+    },
+    progressBar:{
+        marginLeft:'12px', 
+        marginRight:'12px', 
+        width:'60%'
+    },
+    volumeContainer:{
+      width:'20%', 
+      margin:'0 auto', 
+      marginTop:'40px'
+    },
+    volumeAdjuster:{
+        marginTop: "5px",
+        marginLeft: "2px",
+        marginRight: "2px",
+        margin:'0 auto',
+        display:"inline-flex",
+    },
+    card:{
+        textAlign:'center', 
         borderRadius:'50%',
-        height:'400px',
-        width:'400px',
-      }
+        backgroundColor:'#fff2cd',
+        marginTop:"20px"
     }
+    
   }))
     
   
@@ -66,13 +83,43 @@ const useStyles = makeStyles(theme=>({
 
 const Player = () => {
 
+const dispatch = useDispatch()
+const token = useSelector(getUserToken)
+const navigate = useNavigate()
+const addToFavorite = useSelector(getUpdatedFavorite)
+const userProfile = useSelector(getUserProfile)
+const userSessions = useSelector(getSessions)
+useEffect(()=>{
+        //check if user token exists. 
+        dispatch(userToken())
+        //redirect user in case token doesn't exist
+        if(token === 'Request failed with status code 500'
+        || token ==='Request failed with status code 401'){
+        dispatch(resetStore())
+        navigate('/') 
+        }
+
+        if(addToFavorite?.message){
+          dispatch(fetchUserProfile(userProfile._id))
+          dispatch(clearUserFavoriteList())
+        }
+
+        if(userSessions?.message){
+          dispatch(fetchUserProfile(userProfile._id))
+          dispatch(clearUserSessions())
+        }
+
+    },[token.message, addToFavorite, userSessions])
+
       const classes = useStyles()
       const file = useSelector(getFile)
     
-      const [play, setPlay] = useState(true);
+      const [play, setPlay] = useState(false);
       const [values, setValues] = useState({
         volume: 50
       });
+
+
     
       const [progress, setProgress] = useState(0);
     
@@ -80,28 +127,34 @@ const Player = () => {
     
       const playAudio = () => {
         
-        setPlay(false)
+        setPlay(true)
         const test = document.getElementById("testAudio");
         test.play();
       };
     
       const pauseAudio = () => {
-        setPlay(true)
+        setPlay(false)
         const test = document.getElementById("testAudio");
         test.pause();
       };
     
       const reset = () => {
+        setPlay(true)
         const test = document.getElementById("testAudio");
         test.currentTime = 0;
         test.play();
       };
     
       const stop = () => {
-        setPlay(true)
-        const test = document.getElementById("testAudio");
-        test.currentTime = 0;
-        test.pause();
+        setPlay(false)
+        const editedUser = {
+          param: userProfile._id,
+          data: {
+            id:userProfile._id,
+            session: file
+          },
+        }
+      dispatch(updateSessions(editedUser))
       };
     
       const changeVolume = (name) => (event) => {
@@ -113,106 +166,141 @@ const Player = () => {
       
       };
 
-      //to change src dyamically I have to invoke load function and then play()
+      const addToFavorites = () => {
+        const editedUser = {
+          param: userProfile._id,
+          data: {
+            id:userProfile._id,
+            favorites: file
+          },
+        }
+      dispatch(updateFavoriteList(editedUser))
+      }
 
-      // const getFile1 = () => {
-      //   setFile('med5.mp3')
-      //   audioFile.load()
-      //   audioFile.play()
-
-      // }
-
-      // const getFile2 = () => {
-      //   setFile('med10.mp3')
-      //   audioFile.load()
-      //   audioFile.play()
-      //   console.log(audioFile.duration)
-      // }
     
       return (
-        <Grid container className={classes.container} justifyContent='center'>
-  <Grid item xs={12} md={8} lg={8} xl={6}>
-<Typography variant="h3" style={{textAlign:'left'}}>
-  {file.split('.')[0]} min
-</Typography>
+        <Grid 
+        container 
+        justifyContent='center' >
+          
+          <Grid item xs={12} md={8} lg={8} xl={6}>
+            <Typography 
+            variant="h3" 
+            className={classes.audioLenght}>
+            
+            </Typography>
+          </Grid>    
 
-</Grid>       
-        <Grid item xs={12} md={8} lg={8} xl={6}>
+        <Grid item xs={12} md={8} lg={8} xl={9} >
 
-      <Item className={classes.player}>
-            <audio
+          <Item>
+
+            <Card 
+            className={classes.card}>
+      
+            
+              <CardMedia 
+              //autoPlay
+              component={'audio'}
               id="testAudio"
+              src={`/files/${file}`}
+              onEnded={stop}
               onTimeUpdate={() =>
                 setProgress(audioFile.currentTime / audioFile.duration)
               }
-            >
-              <source 
-              src={`/files/${file}`}></source>
-            </audio>
-      
-              {
-                  play ? 
+              ></CardMedia>
+
+              <CardActions>
+              
+                {
+                  !play ? 
                   <PlayCircleOutlinedIcon
-                        style={{ fontSize: "220px" }}
+                        style={{ 
+                          fontSize: "220px",
+                          margin:'0 auto' 
+                        }}
                         onClick={playAudio}
                     />
 
                   : <PauseCircleOutlinedIcon
-                  style={{ fontSize: "220px" }}
-                  onClick={pauseAudio}
-                />
-              }
-          
-            <br />
-                  {values.volume !== 0 ? <VolumeDown /> : <VolumeOffOutlined />}
-              
-                <Slider
-              
-                  aria-label="Volume"
-                  value={values.volume}
-                  onChange={changeVolume("volume")}
-                  style={{
-                    width: "40%",
-                    marginTop: "17px",
-                    marginLeft: "20px",
-                    marginRight: "20px",
-                    display:"inline-flex"
+                  className={classes.pauseAndPlayIcons}
+                  style={{ 
+                    fontSize: "220px", 
+                    margin:'0 auto' 
                   }}
-                />
-                <VolumeUp />
-  
-                <br />
-          
-   
-            
-              <br />
-              {audioFile
-                ? (`${Math.floor(audioFile.currentTime / 60)}
-                  :
-                  ${Math.round(audioFile.currentTime % 60) 
-                  <10
-                  ?  Math.round(audioFile.currentTime % 60)
-                  :  Math.round(audioFile.currentTime % 60)} 
-                  / 
-                  ${Math.floor(audioFile.duration / 60)} 
-                  :
-                  ${Math.round(audioFile.duration % 60)}`)
-                : "0:00"}
-              <br />
-        
-              <progress
-                id="seekbar"
-                value={progress}
-                style={{
-                  width: "200px",
-                  height: "5px",
-                  borderRadius: "25px"
-                }}
-              ></progress>
+                  onClick={pauseAudio}
+                  />
+                }
+              </CardActions>
+              
+              <ReplayIcon
+              onClick={reset} 
+              className={classes.replay}/>
+              
+              <CardActions style={{textAlign:'center'}}>
 
-            </Item>
-          </Grid>
+                  <span 
+                  className={classes.audioTimeAndProgress}>
+                
+                      <p className={classes.audioTime}>
+                      {audioFile
+                      ? `${Math.floor(audioFile.currentTime / 60)}
+                        :
+                        ${Math.round(audioFile.currentTime % 60) 
+                        <10
+                        ?  Math.round(audioFile.currentTime % 60)
+                        :  Math.round(audioFile.currentTime % 60)}`
+                      : '00'}
+                      </p>
+
+                      <progress
+                        id="seekbar"
+                        value={progress}
+                        className={classes.progressBar}>
+                      </progress>
+
+                      <p className={classes.audioTime}>
+                      {audioFile ?
+                      `${Math.floor(audioFile.duration / 60)} 
+                          :
+                          ${Math.round(audioFile.duration % 60)}`
+                        : "0:00"
+                      }
+                      </p>
+                    
+                    </span>
+
+                </CardActions>
+
+                <CardActions 
+                className={classes.volumeContainer}>
+      
+                  {values.volume !== 0 ? <VolumeDown /> : <VolumeOffOutlined />}
+                      
+                        <Slider
+                          className={classes.volumeAdjuster}
+                          aria-label="Volume"
+                          value={values.volume}
+                          onChange={changeVolume("volume")}
+                          
+                        />
+                        <VolumeUp />
+                        <FontAwesomeIcon 
+                          icon={faHeart}
+                          onClick={addToFavorites}
+                        style={{color:userProfile.favorites.includes(file) ? 'black' : 'grey'}} 
+              />
+                </CardActions>
+
+               
+             
+             </Card>
+             
+          </Item>
+            
         </Grid>
+        
+      </Grid>
       );
     
 }

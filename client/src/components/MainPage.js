@@ -1,33 +1,18 @@
 import Grid from "@material-ui/core/Grid"
-import { CardMedia, makeStyles, Typography } from "@material-ui/core"
+import { CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core"
 import Button from '@mui/material/Button';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useState } from "react";
 import Item from "@material-ui/core/Grid"
-import Container from '@mui/material/Container';
 import { useDispatch } from "react-redux";
-import { setFile } from "../features/meditationSlice";
+import { getAllFiles, getUserProfile, setFile } from "../features/meditationSlice";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@mui/material";
+import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { useSelector } from "react-redux"
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme=>({
-    container: {
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        top:'0',
-        left:'0',
-        right:'0',
-        overflow:'none',
-        [theme.breakpoints.only('md')]:{
-            width:'1040px',
-        
-        },
-        [theme.breakpoints.only('xl')]:{
-            width:'100%',
-            overflowX:'hidden'
-        
-        }
-        
-    },
     buttons:{
         color:'white',
         textTransform:'none',
@@ -36,15 +21,6 @@ const useStyles = makeStyles(theme=>({
     images:{
         width:'360px',
         height:'360px',
-        marginLeft:'5px',
-        [theme.breakpoints.up('md')]:{
-            width:'300px',
-            height:'300px',
-        },
-        [theme.breakpoints.only('md')]:{
-            width:'220px',
-            height:'220px',
-        }
     },
     categoryTitle:{
         marginBottom:'20px',
@@ -55,10 +31,26 @@ const useStyles = makeStyles(theme=>({
 }))
 const MainPage = () => {
 
-    const classes = useStyles()
-    const [filter, setFilter] = useState('')
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+const classes = useStyles()
+const [filter, setFilter] = useState('')
+const dispatch = useDispatch()
+const navigate = useNavigate()
+const token = useSelector(getUserToken)
+const allFiles = useSelector(getAllFiles)
+const favorites = useSelector(getUserProfile).favorites
+const [favoriteFilter, setFavoriteFilter] = useState(false)
+
+useEffect(()=>{
+        //check if user token exists. 
+       dispatch(userToken())
+        //redirect user in case token doesn't exist
+        if(token === 'Request failed with status code 500'
+        || token ==='Request failed with status code 401'){
+        dispatch(resetStore())
+        navigate('/') 
+        }
+  
+    },[token.length])
 
 
     const [button, setButton] = useState({
@@ -72,7 +64,7 @@ const MainPage = () => {
     })
 
     const all = () => {
-
+        setFavoriteFilter(false)
         setButton({
             all:true,
             myFavorite:false,
@@ -97,11 +89,13 @@ const MainPage = () => {
             sleep:false,
             walkingMeditation: false
         })
-        setFilter('myFavorite')
+        setFilter('')
+        setFavoriteFilter(true)
 
     }
 
     const begginers = () => {
+        setFavoriteFilter(false)
         setButton({
             all:false,
             myFavorite:false,
@@ -115,6 +109,7 @@ const MainPage = () => {
     }
 
     const stressRelief = () => {
+        setFavoriteFilter(false)
         setButton({
             all:false,
             myFavorite:false,
@@ -128,6 +123,7 @@ const MainPage = () => {
     }
 
     const happines = () => {
+        setFavoriteFilter(false)
         setButton({
             all:false,
             myFavorite:false,
@@ -141,6 +137,7 @@ const MainPage = () => {
     }
 
     const sleep = () => {
+        setFavoriteFilter(false)
         setButton({
             all:false,
             myFavorite:false,
@@ -154,6 +151,7 @@ const MainPage = () => {
     }
 
     const walkingMeditation = () => {
+        setFavoriteFilter(false)
         setButton({
             all:false,
             myFavorite:false,
@@ -166,16 +164,8 @@ const MainPage = () => {
         setFilter('walkingMeditation')
     }
 
-    const files = [
-    'begginers_med5.mp3','stressRelief_med10.mp3','happines_med15.mp3','sleep_med20.mp3',
-    'walkingMeditation_med5.mp3','happines_med10.mp3','begginers_med15.mp3','stressRelief_med20.mp3', 
-    'stressRelief_med5.mp3','happines_med10.mp3','sleep_med15.mp3','begginers_med20.mp3',
-    'stressRelief_med5.mp3','happiness_med10.mp3','sleep_med15.mp3','sleep_med20.mp3',
-    // 'med5.mp3','med10.mp3','med15.mp3','med20.mp3']
-    ]
-
     const selectFile = (item) => {
-        dispatch(setFile(item.split('_')[1]))
+        dispatch(setFile(item))
         navigate('/playFile')  
     }
 
@@ -183,8 +173,10 @@ const MainPage = () => {
 
     
         
-        <Grid container className={classes.container}>
+        <Grid container>
 
+        {Object.keys(allFiles).length !== 0 ?
+<>
             <Grid item xs={12} md={12} lg={12} xl={12}>
 
   
@@ -194,14 +186,20 @@ const MainPage = () => {
                     color: button.all ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }}>All</Button>
+                }}>
+                    All
+                </Button>
+
                 <Button 
                 onClick={myFavorite}
                 sx={{
                     color:button.myFavorite ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }} endIcon={<FavoriteIcon />}>My</Button>
+                }} endIcon={<FavoriteIcon />}>
+                     My
+                </Button>
+               
                 <Button 
                 onClick={begginers}
                 sx={{
@@ -209,108 +207,239 @@ const MainPage = () => {
                     textTransform:'none',
                     fontSize:'20px'
                 }} 
-                >Begginers</Button>
+                >
+                    Begginers
+                </Button>
+
                 <Button 
                 onClick={stressRelief}
                 sx={{
                     color:button.stressRelief ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }}>Stress Relief</Button>
+                }}>
+                    Stress Relief
+                </Button>
+
                 <Button 
                 onClick={happines}
                 sx={{
                     color:button.happines ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }}>Happines</Button>
+                }}>
+                    Happines
+                </Button>
+
                 <Button 
                 onClick={sleep}
                 sx={{
                     color:button.sleep ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }}>Sleep</Button>
+                }}>
+                    Sleep
+                </Button>
+
                 <Button 
                 onClick={walkingMeditation}
                 sx={{
                     color: button.walkingMeditation ? 'grey' : 'white',
                     textTransform:'none',
                     fontSize:'20px'
-                }}>Walking meditation</Button>
+                }}>
+                    Walking meditation
+                </Button>
                            
                     
             </Grid>
 
             <Typography variant="h3" className={classes.categoryTitle}>5 min</Typography>
-            <Grid container justifyContent="center" spacing={2}>
+            <Grid 
+            container 
+            justifyContent="center" 
+            spacing={2}>
          
-            {
-                files
-                .filter(item=>item.includes(filter))
-                .map(item=>{
+            { 
+                favoriteFilter ? 
+                favorites
+                .map((item, index)=>{
                     if(item.includes('med5')){
                         return(
-                            <Grid item xs={12} md={3} lg={3} xl={2}>
+                            <Grid item xs={12} md={3} lg={3} xl={2} key={`${index}${item}`}>
                                 <Item>
-                                    <CardMedia
-                                    onClick={()=>selectFile(item)}
-                                    className={classes.images}
-                                    component={'img'}
-                                    src={`files/${item.split('_')[1].split('.')[0]}.jpeg`}
-                                    ></CardMedia>
-                                </Item>
-                            </Grid>
-
-                        )
-                    }
-                })
-            }
-            </Grid>
-            
-            <Typography className={classes.categoryTitle} variant="h3">10 min</Typography>
-            <Grid container justifyContent="center">
-          
-            { 
-                files
-                .filter(item=>item.includes(filter))
-                .map(item=>{
-                
-                    if(item.includes('med10')){
-                        return(
-                            <Grid item xs={12} md={3} lg={3} xl={2}>
-                                <Item>
-                                <CardMedia
-                                    className={classes.images}
-                                    component={'img'}
-                                    src={`files/${item.split('_')[1].split('.')[0]}.jpeg`}
-                                    ></CardMedia>
-                                </Item>
-                            </Grid>
-
-                        )
-                    }
-                })
-            }
-            </Grid>
-
-            <Typography className={classes.categoryTitle} variant="h3">15 min</Typography>
-            <Grid container justifyContent="center">
-            
-            { 
-                files
-                .filter(item=>item.includes(filter))
-                .map(item=>{
-                    if(item.includes('med15')){
-                        return(
-                            <Grid item xs={12} md={3} lg={3} xl={2}>
-     
-                                  <Item >
+                                    <Card>
                                         <CardMedia
+                                        onClick={()=>selectFile(item)}
                                         className={classes.images}
                                         component={'img'}
-                                        src={`files/${item.split('_')[1].split('.')[0]}.jpeg`}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
                                         ></CardMedia>
+                                        
+                                        <CardContent>
+                                            {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
+                            </Grid>
+
+                        )
+                    }
+                }) 
+                : allFiles.files
+                .filter(item=>item.includes('mp3'))
+                .filter(item=>item.includes(filter))
+                .map((item, index)=>{
+                    if(item.includes('med5')){
+                        return(
+                            <Grid item xs={12} md={3} lg={3} xl={2} key={`${index}${item}`}>
+                                <Item>
+                                    <Card>
+                                        <CardMedia
+                                        onClick={()=>selectFile(item)}
+                                        className={classes.images}
+                                        component={'img'}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
+                                        ></CardMedia>
+                                        
+                                        <CardContent>
+                                        {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
+                            </Grid>
+
+                        )
+                    }
+                })
+            }
+            </Grid>
+            
+            <Typography 
+            className={classes.categoryTitle} 
+            variant="h3">
+                10 min
+            </Typography>
+            <Grid 
+            container 
+            justifyContent="center"
+            spacing={2}>
+          
+            { 
+                favoriteFilter ? 
+                favorites 
+                .map((item, index)=>{
+                    if(item.includes('med10')){
+                        return(
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+                                <Item>
+                                    <Card>
+                                        <CardMedia
+                                        onClick={()=>selectFile(item)}
+                                        className={classes.images}
+                                        component={'img'}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
+                                        ></CardMedia>
+                                        
+                                        <CardContent>
+                                        {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
+                            </Grid>
+
+                        )
+                    }
+                })
+                : 
+                allFiles.files
+                .filter(item=>item.includes('mp3'))
+                .filter(item=>item.includes(filter))
+                .map((item, index)=>{
+                    if(item.includes('med10')){
+                        return(
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+                                <Item>
+                                    <Card>
+                                        <CardMedia
+                                        onClick={()=>selectFile(item)}
+                                        className={classes.images}
+                                        component={'img'}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
+                                        ></CardMedia>
+                                        
+                                        <CardContent>
+                                        {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
+                            </Grid>
+
+                        )
+                    }
+                })
+            }
+            </Grid>
+
+            <Typography 
+            className={classes.categoryTitle} 
+            variant="h3">
+                15 min
+            </Typography>
+
+            <Grid 
+            container 
+            justifyContent="center"
+            spacing={2}>
+            
+            { 
+                favoriteFilter ? 
+                favorites 
+                .map((item, index)=>{
+                    if(item.includes('med15')){
+                        return(
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+     
+                                  <Item >
+                                        <Card>
+                                            <CardMedia
+                                            onClick={()=>selectFile(item)}
+                                            className={classes.images}
+                                            component={'img'}
+                                            src={`files/${item.split('.')[0]}.jpeg`}
+                                            ></CardMedia>
+                                            
+                                            <CardContent>
+                                            {item.split('_')[0]}
+                                            </CardContent>
+                                        </Card>
+                                    </Item>
+                            </Grid>
+
+                        )
+                    }
+                })
+                : allFiles.files
+                .filter(item=>item.includes('mp3'))
+                .filter(item=>item.includes(filter))
+                .map((item, index)=>{
+                    if(item.includes('med15')){
+                        return(
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+     
+                                  <Item >
+                                        <Card>
+                                            <CardMedia
+                                            onClick={()=>selectFile(item)}
+                                            className={classes.images}
+                                            component={'img'}
+                                            src={`files/${item.split('.')[0]}.jpeg`}
+                                            ></CardMedia>
+                                            
+                                            <CardContent>
+                                            {item.split('_')[0]}
+                                            </CardContent>
+                                        </Card>
                                     </Item>
                             </Grid>
 
@@ -320,35 +449,75 @@ const MainPage = () => {
             }
             </Grid>
 
-            <Typography className={classes.categoryTitle} variant="h3">20 min</Typography>
-            <Grid container justifyContent="center">
+            <Typography 
+            className={classes.categoryTitle} 
+            variant="h3">
+                20 min
+            </Typography>
+
+            <Grid 
+            container 
+            justifyContent="center"
+            spacing={2}>
          
             { 
-                files
-                .filter(item=>item.includes(filter))
-                .map(item=>{
+                favoriteFilter ? 
+                favorites 
+                .map((item, index)=>{
                     if(item.includes('med20')){
                         return(
-                            <Grid item xs={12} md={3} lg={3} xl={2}>
-     
-                          <Item>
-                                    <CardMedia
-                                    className={classes.images}
-                                    component={'img'}
-                                    src={`files/${item.split('_')[1].split('.')[0]}.jpeg`}
-                                    ></CardMedia></Item>
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+                                <Item>
+                                    <Card>
+                                        <CardMedia
+                                        onClick={()=>selectFile(item)}
+                                        className={classes.images}
+                                        component={'img'}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
+                                        ></CardMedia>
+                                        
+                                        <CardContent>
+                                        {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
+                            </Grid>
+
+                        )
+                    }
+                })
+
+                : allFiles.files
+                .filter(item=>item.includes('mp3'))
+                .filter(item=>item.includes(filter))
+                .map((item, index)=>{
+                    if(item.includes('med20')){
+                        return(
+                            <Grid key={`${index}${item}`} item xs={12} md={3} lg={3} xl={2}>
+                                <Item>
+                                    <Card>
+                                        <CardMedia
+                                        onClick={()=>selectFile(item)}
+                                        className={classes.images}
+                                        component={'img'}
+                                        src={`files/${item.split('.')[0]}.jpeg`}
+                                        ></CardMedia>
+                                        
+                                        <CardContent>
+                                        {item.split('_')[0]}
+                                        </CardContent>
+                                    </Card>
+                                </Item>
                             </Grid>
 
                         )
                     }
                 })
             }
-            </Grid>
-            
-            
-
-         
         </Grid>
+        </>
+       : null }    
+    </Grid>
     )
 
 }

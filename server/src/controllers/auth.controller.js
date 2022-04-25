@@ -4,14 +4,14 @@ import User from '../models/user.model'
 import config from '../config/config'
 import jwtDecode from 'jwt-decode'
 const signin = (req, res) => {
-    User.findOne({'username': req.body.username},(err, user) => {
+    User.findOne({'email': req.body.email},(err, user) => {
         if(err || !user){
             return res.send({error: 'User not found'})
         }
         if(!user.authenticate(req.body.password)){
-            return res.send({error: 'Username and password do not match'})
+            return res.send({error: 'Email and password do not match'})
         }
-        const token = jwt.sign({_id: user._id, name:user.name, role:user.role}, config.secret)
+        const token = jwt.sign({_id: user._id, name:user.name}, config.secret)
         res.cookie('userJwtToken', token, {expire: new Date()+999, httpOnly:true})
         res.send({
             token,
@@ -19,7 +19,8 @@ const signin = (req, res) => {
                 _id:user._id, 
                 name: user.name, 
                 username: user.username,
-                role: user.role
+                role: user.role,
+                favorites:user.favorites
             }
         })
     })

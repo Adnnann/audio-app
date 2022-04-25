@@ -5,28 +5,26 @@ import { Grid, makeStyles, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles(theme=>({
     welcomePage:{
-      marginTop:'20px'
+      maxWidth:'100%',
     },
     welcomePageTitle:{
-        marginTop:'20px',
         paddingTop:'20px',
         paddingBottom:'20px',
-        backgroundColor:'#a2c3c8',
-        bottom:'0',
-        position:'fixed',
-        left:'0',
-        right:'0'
     },
+    welcomePageText:{
+        textAlign:'center'
+    }
     
 }))
 
 const Home = () => {
 
     const classes = useStyles()
-
+  
+    
     return(
         <Grid container justifyContent={'center'} className={classes.welcomePage}>
-            <Grid item xs={12} md={6} lg={6} xl={6}>
+            <Grid item xs={12} md={6} lg={6} xl={6} className={classes.welcomePageTitle}>
                 <Item>
                     <CardMedia 
                         component={'img'}
@@ -35,9 +33,9 @@ const Home = () => {
                 </Item>
             </Grid>
 
-            <Grid item xs={12} md={12} lg={12} xl={12} className={classes.welcomePageTitle}>
+            <Grid item xs={12} md={12} lg={12} xl={12} >
                 <Item>
-                    <Typography variant='h2'>
+                    <Typography variant='h2' className={classes.welcomePageText}>
                         Live more. Stress less. Live better
                     </Typography>
                 </Item>
