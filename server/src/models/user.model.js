@@ -33,7 +33,18 @@ const UserSchema = new mongoose.Schema({
         type:Array
     },
     sessions:{
+        type:Array,
+    },
+    mindfulMinutes:{
+        type:Number,
+        default:0
+    },
+    dayStreak:{
         type:Array
+    },
+    longestStreak:{
+        type:Number,
+        default:0
     },
     salt:String
 })
@@ -43,9 +54,6 @@ UserSchema.virtual('password')
     this._password = password,
     this.salt = this.makeSalt(),
     this.hashed_password = this.encryptPassword(password)
-
-    console.log(this.hashed_password)
-
 })
 
 UserSchema.methods = {

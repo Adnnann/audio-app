@@ -19,7 +19,6 @@ const signin = (req, res) => {
                 _id:user._id, 
                 name: user.name, 
                 username: user.username,
-                role: user.role,
                 favorites:user.favorites
             }
         })

@@ -20,7 +20,6 @@ router.route('/api/users/')
 
 router.route('/api/users/:userId')
 .get(userCtrl.read)
-.put(userCtrl.update)
 .delete(userCtrl.remove)
 
 router.route('/api/users/updateFavorite/:userId')
@@ -28,6 +27,19 @@ router.route('/api/users/updateFavorite/:userId')
 
 router.route('/api/users/updateSessions/:userId')
 .put(userCtrl.updateSessions)
+
+router.route('/api/users/updateMindfulMinutes/:userId')
+.put(userCtrl.updateMindfulMinutes)
+
+router.route('/api/users/updateStreak/:userId')
+.put(userCtrl.updateLongestDayStreak)
+
+router.route('/api/users/updateUserPassword/:userId')
+.put(userCtrl.updateUserPassword)
+
+router.route('/api/users/updateUserProfile/:userId')
+.put(userCtrl.updateUserProfile)
+
 
 
 router.param('userId', userCtrl.userByID)

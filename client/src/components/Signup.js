@@ -104,10 +104,7 @@ const Signup = () =>{
         dispatch(createUser(user))
        
     }
-    const redirectTosignin = () =>{
-        navigate('/')
-        //dispatch(cleanRegisteredUserData())
-    }
+ 
     return(
         <Grid container>
             <Box className={classes.card}>
@@ -122,7 +119,7 @@ const Signup = () =>{
                     id="username" 
                     placeholder="Username" 
                     className={classes.textField}
-                    value={values.firstName} 
+                    value={values.username} 
                     onChange={handleChange('username')} 
                     margin="normal" />
                     <br />

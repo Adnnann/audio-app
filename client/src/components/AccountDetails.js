@@ -14,7 +14,7 @@ import { makeStyles } from "@material-ui/core"
 import { Typography } from "@mui/material"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from "react-router-dom"
-import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { getUserToken, userToken, resetStore, updateUserProfile, getUserProfile, getUpdateUserProfile, clearUpdateUserProfile, fetchUserProfile } from "../features/meditationSlice"
 import { useDispatch } from "react-redux"
 import { useSelector } from "react-redux"
 
@@ -78,9 +78,12 @@ const AccountDetails = () => {
     const token = useSelector(getUserToken)
     const classes = useStyles()
     const navigate = useNavigate()
+    const userProfile = useSelector(getUserProfile)
+    const updateUserProfileStatus = useSelector(getUpdateUserProfile)
+
     const [values, setValues] = useState({
-        email:'',
-        username:''
+        email:userProfile.email,
+        username:userProfile.username
     })
 
     const [editUserData, setEditUserData] = useState({
@@ -89,6 +92,15 @@ const AccountDetails = () => {
     })
 
     useEffect(()=>{
+
+        if(values.email === '' || values.username === ''){
+            setValues({
+                email:userProfile.email,
+                username:userProfile.username
+            })
+        }
+        
+
         //check if user token exists. 
         dispatch(userToken())
         //redirect user in case token doesn't exist
@@ -98,14 +110,24 @@ const AccountDetails = () => {
         navigate('/') 
         }
 
-    },[token.length])
+        if(updateUserProfileStatus?.message){
+            dispatch(clearUpdateUserProfile())
+            dispatch(fetchUserProfile(userProfile._id))
+            navigate('/musicLibrary')
+        }
+
+    },[token.length, updateUserProfileStatus, userProfile.email])
 
     const clickSubmit = () => {
-        const user = {
-            email: values.email || undefined,
-            password: values.password || undefined
+        const userToEdit = {
+            param: userProfile._id,
+            data:{
+            email: values.email === userProfile.email ? undefined : values.email,
+            username: values.username === userProfile.username ? undefined : values.username
+            }
         }
-        //dispatch(signinUser(user))    
+        console.log(userToEdit)
+        dispatch(updateUserProfile(userToEdit))    
     }
 
     // get values from input fields
@@ -152,7 +174,7 @@ const AccountDetails = () => {
                     label="Username" 
                     className={classes.textField}
                     value={values.username} 
-                    onChange={handleChange('password')} 
+                    onChange={handleChange('username')} 
                     margin="normal" 
                     disabled={editUserData.username ? false : true}
                     
@@ -161,14 +183,6 @@ const AccountDetails = () => {
                     onClick={()=>setEditUserData({username:true})}
                     className={classes.edit}/>
                     <br />
-                    {/* { //display error returned from server
-                        Object.keys(userSigninData).length !== 0 && (
-                            <Typography component='p' color='error'>
-                                <Icon color='error' className={classes.error}></Icon>
-                                {userSigninData.error}
-                            </Typography>
-                        )
-                    } */}
     
                 </CardContent>
 
@@ -184,6 +198,14 @@ const AccountDetails = () => {
             </CardActions>
             
         </Box>
+        {updateUserProfileStatus?.error && (
+                <Grid item xs={12} md={12} lg={12} xl={12}>
+                    <Item>
+                        <p style={{textAlign:'center', color:"red"}}>{updateUserProfileStatus.error}</p>
+                    </Item>
+                </Grid>
+            )
+            }
     </Grid>
     )
 }

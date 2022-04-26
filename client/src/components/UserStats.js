@@ -8,7 +8,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from "react-router-dom"
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSliders, faGlasses, faClock, faTrophy} from '@fortawesome/free-solid-svg-icons'
-import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { getUserToken, userToken, resetStore, getUserProfile } from "../features/meditationSlice"
 import { useDispatch } from "react-redux"
 import { useSelector } from "react-redux"
 import { useEffect } from "react";
@@ -54,6 +54,7 @@ const UserStats = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const token = useSelector(getUserToken)
+    const userProfile = useSelector(getUserProfile)
     
     useEffect(()=>{
             //check if user token exists. 
@@ -88,13 +89,13 @@ const UserStats = () => {
                     <Typography 
                     variant="h4" 
                     className={classes.stats}>
-                        DAY STREAK
+                        FIRST COMPLETED SESSION
                     </Typography>
 
                     <Typography 
                     variant="h3" 
                     className={classes.stats}>
-                        1
+                       {userProfile.sessions.length > 0 ? '1' : '0'}
                     </Typography>
 
                 </Item>
@@ -122,7 +123,7 @@ const UserStats = () => {
                         <Typography 
                         variant="h3" 
                         className={classes.stats}>
-                            1
+                            {userProfile.longestStreak}
                         </Typography>
 
                     </Item>
@@ -147,7 +148,7 @@ const UserStats = () => {
                         <Typography 
                         variant="h3" 
                         className={classes.stats}>
-                            1
+                            {userProfile.sessions.length}
                         </Typography>
 
                     </Item>
@@ -171,7 +172,14 @@ const UserStats = () => {
                         <Typography 
                         variant="h3" 
                         className={classes.stats}>
-                            3m
+                        {    
+                        `${Math.floor(userProfile.mindfulMinutes / 60)}
+                        :
+                        ${Math.round(userProfile.mindfulMinutes % 60) 
+                        <10
+                        ?  Math.round(userProfile.mindfulMinutes % 60)
+                        :  Math.round(userProfile.mindfulMinutes % 60)}`
+                        }
                         </Typography>
                     </Item>
                 

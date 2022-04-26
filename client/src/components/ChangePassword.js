@@ -8,16 +8,12 @@ import TextField from "@material-ui/core/TextField"
 import Grid from "@material-ui/core/Grid"
 import { makeStyles } from "@material-ui/core"
 import { useDispatch } from 'react-redux';
-// import { getUser, 
-//         createUser, 
-//         cleanRegisteredUserData,
-//         getCloseAccountData,
-//         cleanStore} from "../features/usersSlice"
 import { useNavigate } from "react-router"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { getUserToken, userToken, resetStore, updateUserPassword, getUserProfile, getUserPassword, clearUpdatePassword, fetchUserProfile } from "../features/meditationSlice"
 import { useSelector } from "react-redux"
 import { useEffect } from "react";
+import Item from "@material-ui/core/Grid"
 
 const useStyles = makeStyles(theme=>({
     card: {
@@ -80,6 +76,10 @@ const ChangePassword = () =>{
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const token = useSelector(getUserToken)
+
+    const userProfile = useSelector(getUserProfile)
+    const passwordUpdateStatus = useSelector(getUserPassword)
+
     
     useEffect(()=>{
         //check if user token exists. 
@@ -90,54 +90,55 @@ const ChangePassword = () =>{
         dispatch(resetStore())
         navigate('/') 
         }
-    },[token.length])
+
+        if(passwordUpdateStatus?.message){
+            dispatch(clearUpdatePassword())
+            navigate('/musicLibrary')
+        }
+
+    },[token.length, passwordUpdateStatus])
 
 
     const [values, setValues] = useState({
         oldPassword:'',
         newPassword:'',
-        confirmPassword:'',
+        repeatedPassword:'',
         error:''
     })
 
-    // useEffect(()=>{
-    //     if(closeAccountData.hasOwnProperty('message') || closeAccountData.hasOwnProperty('error') ){
-    //         dispatch(cleanStore())
-    //     }
-    // },[closeAccountData.message, closeAccountData.error])
-  
     const handleChange = name => event =>{
         setValues({...values, [name]: event.target.value})
     }
 
     const clickSubmit = () => {
-        const user = {
-            oldPassword: values.oldPassword || undefined,
-            newPassword:values.oldPassword || undefined,
-            confirmPassword:values.oldPassword || undefined,
-        }
 
-        
-        if(!values.confirmationPassword || values.confirmationPassword === ''){
-            setValues({...values, error: 'Please repeat your password'})
-            return
-        }else if(values.password !== values.confirmationPassword){
-            setValues({...values, error: 'Password do not match'})
-            return
+        if(values.password !== '' && (values.newPassword === '' || values.repeatedPassword === '')){
+            setValues({
+                ...values, 
+                error:'Enter old, new and repated password!'})
+                return
+        }else if(values.newPassword !== values.repeatedPassword){
+            setValues({
+                ...values, 
+                error:'New and repeated password do not match!'})
+                return
         }else{
-            setValues({...values, error: ''})
+            setValues({
+                ...values, 
+                error:''})
         }
 
-        //dispatch(createUser(user))
-       
-        // if(userData.hasOwnProperty('message')){
-        //     setValues({...values, error: '', open:true})
-        // }
+        const editedUser = {
+            param: userProfile._id,
+            data:{
+                password: values.oldPassword,
+                newPassword: values.newPassword
+            }
+        }
+
+        dispatch(updateUserPassword(editedUser))
     }
-    const redirectTosignin = () =>{
-        navigate('/')
-        //dispatch(cleanRegisteredUserData())
-    }
+  
     return(
         <Grid container>
             <Box className={classes.card}>
@@ -150,6 +151,7 @@ const ChangePassword = () =>{
                 <CardContent>
                     <TextField 
                     id="password" 
+                    type="password"
                     placeholder="Old password" 
                     className={classes.textField}
                     value={values.oldPassword} 
@@ -172,25 +174,10 @@ const ChangePassword = () =>{
                     placeholder="Confirm Password" 
                     className={classes.textField}
                     value={values.confirmPassword} 
-                    onChange={handleChange('confirmPassword')} 
+                    onChange={handleChange('repeatedPassword')} 
                     margin="normal" />
 
                     <br />
-
-                    {/* {
-                    values.error ? (
-                        <Typography component='p' color='error'>
-                            <Icon color='error' className={classes.error}></Icon>
-                            {values.error}
-                        </Typography> 
-                    ) 
-                : userData.hasOwnProperty('error') && (
-                        <Typography component='p' color='error'>
-                            <Icon color='error' className={classes.error}></Icon>
-                            {userData.error.split(':')[2] ? userData.error.split(':')[2] : userData.error}
-                        </Typography> 
-                    ) 
-                } */}
 
                 </CardContent>
 
@@ -202,17 +189,26 @@ const ChangePassword = () =>{
 
             </Box>
 
-            {/* <Dialog open={userData.hasOwnProperty('message') ? true : false}>
-                <DialogTitle>New Account</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        New account successfuly created.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                        <Button color="primary" autoFocus="autoFocus" onClick={redirectTosignin}>Sign In</Button>
-                </DialogActions>
-            </Dialog> */}
+            {passwordUpdateStatus?.error && (
+                <Grid item xs={12} md={12} lg={12} xl={12}>
+                    <Item>
+                        <p style={{textAlign:'center', color:"red"}}>{passwordUpdateStatus.error}</p>
+                    </Item>
+                </Grid>
+            )
+            }
+
+            {
+                values.error !== '' && (
+                    <Grid item xs={12} md={12} lg={12} xl={12}>
+                        <Item>
+                            <p style={{textAlign:'center', color:"red"}}>{values.error}</p>
+                        </Item>
+                </Grid>
+                )
+                
+            }
+
         </Grid>
     )
 }

@@ -1,9 +1,20 @@
 import User from '../models/user.model'
-import _, { indexOf } from 'lodash'
 import errorHandler from '../controllers/helpers/dbErrorHandlers'
+import _ from 'lodash'
 
 
-  const create = (req, res, next) => {
+  const create = async(req, res, next) => {
+
+    let usernameToCheck = await User.findOne({'username':req.body.username})
+    let emailToCheck = await User.findOne({'email':req.body.email})
+    
+    if(usernameToCheck){
+        return res.send({error:"Username is already taken!"})
+    }
+
+    if(emailToCheck){
+        return res.send({error:"Email is already taken!"})
+    }
 
     const user = new User(req.body)
     user.save((err, result) => {
@@ -16,34 +27,73 @@ import errorHandler from '../controllers/helpers/dbErrorHandlers'
 }
 
 const read = (req, res) => {
-    req.profile.hashed_password = undefined
-    req.profile.salt = undefined
     res.status(200).json(req.profile)
 }
 
-const update = (req, res, next) => {
+const updateUserProfile = async(req, res, next) => {
+    
+    let usernameToCheck = await User.findOne({'username':req.body.username})
+    let emailToCheck = await User.findOne({'email':req.body.email})
+    
+    if(usernameToCheck){
+        return res.send({error:"Username is already taken!"})
+    }
+
+    if(emailToCheck){
+        return res.send({error:"Email is already taken!"})
+    }
+
     let user = req.profile
 
-   user = _.extend(user, req.body);
-    user.updated = Date.now()
-    user.favorites.push({favorite:req.body.favorites})
+    user = _.extend(user, req.body);
 
-    
-    user.save(err=>{
+    user.email = req.body.email ? req.body.email : user.email
+    user.username = req.body.username ? req.body.username : user.username
+                       
+    user.updated = Date.now()
+    user.save((err)=>{
         if(err){
-            return res.send({error: errorHandler.getErrorMessage(err)})
+            return res.send({error:errorHandler.getErrorMessage(err)})
+        }else{
+            return res.send({
+                message:'Data updated',
+                data:user})
         }
-        res.send({message: 'Data updated'})
+    })
+}
+
+const updateUserPassword = async(req, res, next) => {
+    
+    let user = req.profile
+
+    user = _.extend(user, req.body);
+
+    let userProfile = await User.findOne({'_id':req.profile._id})
+
+    if(!userProfile.authenticate(req.body.password)){
+        return res.send({error: 'Incorrect old password'})
+    }else{
+        user.hashed_password = null
+        user.password = req.body.newPassword
+    }
+                       
+    user.updated = Date.now()
+    user.save((err)=>{
+        if(err){
+            return res.send({error:errorHandler.getErrorMessage(err)})
+        }else{
+            return res.send({
+                message:'Data updated',
+                data:user})
+        }
     })
 }
 
 const updateFavorite = (req, res, next) => {
-
+console.log(req.body)
     User.findById({_id:req.body.id}, (err, user)=>{
 
-        console.log(req.body.favorites)
         if(user.favorites.includes(req.body.favorites)){
-            console.log('yes')
             let user = req.profile
 
             let index = user.favorites.indexOf(req.body.favorites)
@@ -64,6 +114,7 @@ const updateFavorite = (req, res, next) => {
             })
         
         }else{
+            console.log('here')
             User.findOneAndUpdate(
                 {_id: req.body.id},
                 {$push: {favorites:req.body.favorites}}
@@ -72,7 +123,6 @@ const updateFavorite = (req, res, next) => {
                 if(err){
                     return res.send({error:'error'})
                 }else{
-                    console.log(user.favorites)
                     return res.send({
                         message:'Favorites updated',
                         data: user.favorites
@@ -85,7 +135,6 @@ const updateFavorite = (req, res, next) => {
     
 
 }
-
 const updateSessions = (req, res, next) => {
 
     User.findOneAndUpdate(
@@ -101,6 +150,29 @@ const updateSessions = (req, res, next) => {
                 message:'Sessions updated'})
         }
     });
+}
+
+const updateMindfulMinutes = (req, res, next) => {
+
+    User.findById({_id: req.body.id},(err, user)=>{
+
+        let minutes = (user.mindfulMinutes - req.body.mindfulMinutes[0]) + req.body.mindfulMinutes[1]
+        
+        User.findOneAndUpdate(
+            {_id: req.body.id},
+            {mindfulMinutes: minutes}
+        )
+        .exec((err)=>{
+            if(err){
+                return res.send({error:'Error'})
+            }else{
+                return res.send({
+                    message:'Mindfull minutes updated'})
+            }
+        });
+    })
+
+    
 }
     
 const remove = (req, res, next) => {
@@ -123,12 +195,34 @@ const userByID = (req, res, next, id) => {
     })
 }
 
+const updateLongestDayStreak = (req, res, next) => {
+    User.findById({_id:req.body.id}, (err, user)=>{
+    
+        console.log(req.body.streak)
+        user.dayStreak = req.body.streak
+        user.longestStreak = req.body.longestStreak
+
+        user.save((err)=>{
+            if(err){
+                return res.send({error:'error'})
+            }else{
+        
+                return res.send({
+                    message:"Favorites updated",
+                })
+            }
+        })
+    })
+}
 export default {
     create,
     read, 
-    update,
+    updateUserPassword,
     remove,
     userByID,
     updateSessions,
-    updateFavorite
+    updateMindfulMinutes,
+    updateFavorite,
+    updateUserProfile,
+    updateLongestDayStreak
 }

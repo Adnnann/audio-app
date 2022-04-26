@@ -97,10 +97,6 @@ const UserProfile = () =>{
         },[token.length])
     
     
-
-
-
-
     return(
         <Grid container>
             

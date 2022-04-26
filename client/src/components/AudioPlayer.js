@@ -9,14 +9,18 @@ import VolumeUp from "@mui/icons-material/VolumeUp";
 import VolumeOffOutlined from "@mui/icons-material/VolumeOffOutlined";
 import Slider from '@mui/material/Slider';
 import { useSelector } from "react-redux";
-import {clearUserFavoriteList, 
+import {clearMindfulMinutes, clearStreak, clearUserFavoriteList, 
         fetchUserProfile,
         getFile, 
+        getMindfullMinutes, 
         getSessions, 
+        getStreak, 
         getUpdatedFavorite, 
         getUserProfile, 
         updateFavoriteList,
+        updateMindfullMinutes,
         updateSessions,
+        updateStreak,
 } from "../features/meditationSlice";
 import { Card, CardActions, CardMedia,  Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core"
@@ -79,8 +83,6 @@ const useStyles = makeStyles(theme=>({
   }))
     
   
-
-
 const Player = () => {
 
 const dispatch = useDispatch()
@@ -89,6 +91,11 @@ const navigate = useNavigate()
 const addToFavorite = useSelector(getUpdatedFavorite)
 const userProfile = useSelector(getUserProfile)
 const userSessions = useSelector(getSessions)
+const mindfullMinutes = useSelector(getMindfullMinutes)
+const streak = useSelector(getStreak)
+
+const [pausedTime, setPausedTime] = useState([])
+const [paused, setPaused] = useState(false)
 useEffect(()=>{
         //check if user token exists. 
         dispatch(userToken())
@@ -100,6 +107,7 @@ useEffect(()=>{
         }
 
         if(addToFavorite?.message){
+          console.log('test')
           dispatch(fetchUserProfile(userProfile._id))
           dispatch(clearUserFavoriteList())
         }
@@ -109,7 +117,32 @@ useEffect(()=>{
           dispatch(clearUserSessions())
         }
 
-    },[token.message, addToFavorite, userSessions])
+        if(mindfullMinutes?.message){
+          dispatch(fetchUserProfile(userProfile._id))
+          dispatch(clearMindfulMinutes())
+        }
+
+        if(streak?.message){
+          dispatch(fetchUserProfile(userProfile._id))
+          dispatch(clearStreak())
+        }
+
+        if(paused){
+  
+  
+          const editedUser = {
+            param: userProfile._id,
+            data: {
+              id:userProfile._id,
+              mindfulMinutes: pausedTime.length < 2 ? [0,pausedTime[0]] : [pausedTime[pausedTime.length-2], pausedTime[pausedTime.length-1]]
+            },
+          }
+     
+          dispatch(updateMindfullMinutes(editedUser))
+          setPaused(false)
+        }
+
+    },[token.message, addToFavorite, userSessions, mindfullMinutes, paused, streak])
 
       const classes = useStyles()
       const file = useSelector(getFile)
@@ -119,50 +152,120 @@ useEffect(()=>{
         volume: 50
       });
 
-
-    
       const [progress, setProgress] = useState(0);
-    
       const audioFile = document.getElementById("testAudio");
     
       const playAudio = () => {
+
+      setPlay(true)
+      setPaused(false)
+  
+      audioFile.play();
+      //calculate time difference between two days and then subtract and divide to get diff in days
+      //between two dates. In case date between last element in array dayStreak is more than one higher
+      //than current date empty dayStreak array - otherwise store value
+      let streak = `${new Date().getUTCMonth()}/${new Date().getUTCDate()+5}/${new Date().getUTCFullYear()}`
+  
+      if(!userProfile.dayStreak.includes(streak)){
+      let dayStreak = []
+      let longestStreak = ''
+       
+       if(userProfile.dayStreak.length === 1){
+         
+        let dateDiff = new Date(streak).getTime() - new Date(userProfile.dayStreak[0]).getTime()
+
+          if(Math.abs(Math.ceil(dateDiff/(60*60*1000*24))) === 1){
+            
+            dayStreak = [...userProfile.dayStreak, streak]
+
+            longestStreak = userProfile.longestStreak < dayStreak.length ? 
+            userProfile.longestStreak+1 
+            : userProfile.longestStreak
+
+          }else{
+            dayStreak = []
+          }
+
+       }else if(userProfile.dayStreak.length > 1){
+
+        let dateDiff2 = new Date(streak).getTime() - new Date(userProfile.dayStreak[userProfile.dayStreak.length - 1]).getTime()
+
+          if(Math.abs(Math.ceil(dateDiff2/(60*60*1000*24))) === 1){
+            dayStreak = [...userProfile.dayStreak, streak]
+
+            longestStreak = userProfile.longestStreak < dayStreak.length ? 
+            userProfile.longestStreak+1 
+          : userProfile.longestStreak
+          }else{
+            dayStreak = []
+          }
+      }else if(userProfile.dayStreak.length ===0){
+          dayStreak.push(streak)
+      }
+
+      if(userProfile.longestStreak === 0){
+        longestStreak = 1
+      }
         
-        setPlay(true)
-        const test = document.getElementById("testAudio");
-        test.play();
-      };
     
-      const pauseAudio = () => {
-        setPlay(false)
-        const test = document.getElementById("testAudio");
-        test.pause();
-      };
-    
-      const reset = () => {
-        setPlay(true)
-        const test = document.getElementById("testAudio");
-        test.currentTime = 0;
-        test.play();
-      };
-    
-      const stop = () => {
-        setPlay(false)
         const editedUser = {
           param: userProfile._id,
           data: {
             id:userProfile._id,
-            session: file
+            streak: dayStreak,
+            longestStreak: longestStreak !== '' ? longestStreak : userProfile.longestStreak
           },
         }
+
+        
+
+        dispatch(updateStreak(editedUser))
+      }
+        
+      };
+    
+      const pauseAudio = () => {
+        setPlay(false)
+        setPaused(true)
+        audioFile.pause();
+
+        
+        setPausedTime([...pausedTime, audioFile.currentTime])
+       
+
+      };
+    
+      const reset = () => {
+        setPlay(true)
+        audioFile.currentTime = 0;
+        audioFile.play();
+      };
+    
+      const stop = () => {
+
+       
+          setPausedTime([...pausedTime, audioFile.currentTime])
+        
+
+        setPlay(false)
+        setPaused(true)
+
+        const editedUser = {
+          param: userProfile._id,
+          data: {
+            id:userProfile._id,
+            session: file,
+          },
+        }
+   
       dispatch(updateSessions(editedUser))
+   
       };
     
       const changeVolume = (name) => (event) => {
-        
-
-            const test = document.getElementById("testAudio");
+         
             setValues({ ...values, [name]: event.target.value });
-            test.volume = event.target.value / 100;
+            audioFile.volume = event.target.value / 100;
       
       };
 
@@ -182,7 +285,9 @@ useEffect(()=>{
         <Grid 
         container 
         justifyContent='center' >
-          
+
+        { file ?
+          <>
           <Grid item xs={12} md={8} lg={8} xl={6}>
             <Typography 
             variant="h3" 
@@ -260,10 +365,12 @@ useEffect(()=>{
                       </progress>
 
                       <p className={classes.audioTime}>
-                      {audioFile ?
+                      
+                      { //added && - check if it works
+                        audioFile && audioFile.duration ?
                       `${Math.floor(audioFile.duration / 60)} 
-                          :
-                          ${Math.round(audioFile.duration % 60)}`
+                       :
+                      ${Math.round(audioFile.duration % 60)}`
                         : "0:00"
                       }
                       </p>
@@ -299,7 +406,8 @@ useEffect(()=>{
           </Item>
             
         </Grid>
-        
+       </>
+        : null}
       </Grid>
       );
     
