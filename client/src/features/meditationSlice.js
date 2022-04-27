@@ -23,6 +23,17 @@ export const loginUser = createAsyncThunk('meditation/userLoginData', async(user
   .catch(error=>error)
 })
 
+export const fbLogin = createAsyncThunk('meditation/fbLoginData', async()=>{
+  return await axios.get('/auth/signinFacebookUser', {
+    header:{
+      'Accept':'application/json',
+      'Content-Type':'application/json'
+    }
+  })
+  .then(response=>response.data)
+  .catch(error=>error)
+})
+
 export const fetchUserProfile = createAsyncThunk('meditation/userProfile', async(param)=>{
     return await axios.get(`/api/users/${param}`, {
       header:{
@@ -32,7 +43,18 @@ export const fetchUserProfile = createAsyncThunk('meditation/userProfile', async
     })
     .then(response=>response.data)
     .catch(error=>error)
+})
+
+export const fetchFBUserProfile = createAsyncThunk('meditation/userProfile', async(param)=>{
+  return await axios.get(`/api/users/${param}`, {
+    header:{
+      'Accept':'application/json',
+      'Content-Type':'application/json'
+    }
   })
+  .then(response=>response.data)
+  .catch(error=>error)
+})
 
 
 export const updateUserPassword = createAsyncThunk('meditation/updatePassword', async(editedUser)=>{
@@ -138,6 +160,7 @@ const initialState = {
     userProfile:{},
     updatePassword:{},
     updateProfile:{},
+    fbLoginData:{},
     //audio files
     file:'',
     allFiles:{},
@@ -225,6 +248,12 @@ export const meditationSlice = createSlice({
         [updateUserProfile.fulfilled]: (state, {payload}) => {
           return {...state, updateProfile:payload}
         },
+        [fbLogin.fulfilled]: (state, {payload}) => {
+          return {...state, userProfile:payload}
+        },
+        [fetchFBUserProfile.fulfilled]:(state,{payload})=>{
+          state.userProfile = payload
+        }
     }
 })
 

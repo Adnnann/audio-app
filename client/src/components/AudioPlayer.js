@@ -164,7 +164,7 @@ useEffect(()=>{
       //calculate time difference between two days and then subtract and divide to get diff in days
       //between two dates. In case date between last element in array dayStreak is more than one higher
       //than current date empty dayStreak array - otherwise store value
-      let streak = `${new Date().getUTCMonth()}/${new Date().getUTCDate()+5}/${new Date().getUTCFullYear()}`
+      let streak = `${new Date().getUTCMonth()}/${new Date().getUTCDate()}/${new Date().getUTCFullYear()}`
   
       if(!userProfile.dayStreak.includes(streak)){
       let dayStreak = []

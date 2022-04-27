@@ -2,10 +2,6 @@ import React from "react";
 import AppBar  from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Item from '@mui/material/Grid'
-// import {signoutUser, 
-//         getUserSigninData,
-//         cleanStore,
-//         getUserDataToDisplay} from "../../features/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -18,7 +14,8 @@ import { useState } from "react";
 import Logo from '../assets/images/logo.jpeg'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser}  from '@fortawesome/free-solid-svg-icons'
-import { getUserToken } from "../features/meditationSlice";
+import { fbLogin, getUserToken, fetchFiles } from "../features/meditationSlice";
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme=>({
     header:{
@@ -53,6 +50,16 @@ const useStyles = makeStyles(theme=>({
 }))
 
 const Header = () => {
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if(window.location.hash === '#_=_'){
+      dispatch(fbLogin()) 
+      dispatch(fetchFiles())
+      navigate('/musicLibrary') 
+    }
+  }, [])
 
   const classes = useStyles()
   const navigate = useNavigate()

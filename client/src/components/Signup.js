@@ -17,10 +17,12 @@ import DialogTitle from "@material-ui/core/DialogTitle"
 import {  useDispatch } from 'react-redux';
 import {
         createUser,
+        fbLogin,
         getUserProfile
 } from "../features/meditationSlice"
 import { useNavigate } from "react-router"
 import { useSelector } from "react-redux"
+import FacebookLogin from 'react-facebook-login';
 
 const useStyles = makeStyles(theme=>({
     container: {
@@ -104,6 +106,14 @@ const Signup = () =>{
         dispatch(createUser(user))
        
     }
+
+    const responseFacebook = (response) => {
+        console.log(response);
+      }
+
+    const FBSignup = () => {
+        dispatch(fbLogin())
+    }
  
     return(
         <Grid container>
@@ -173,16 +183,19 @@ const Signup = () =>{
             </CardActions>
 
             <CardActions>
-                <Button 
+                <a 
+                href="http://localhost:5000/auth/facebook/callback"
                 className={classes.submit} 
                 color='primary' 
                 variant="contained" 
-                onClick={clickSubmit}>
+                >
                     Sign in with Facebook
-                </Button>
+                </a>
             </CardActions>
 
         </Box>
+
+   
 
             {/* <Dialog open={userData.hasOwnProperty('message') ? true : false}>
                 <DialogTitle>New Account</DialogTitle>

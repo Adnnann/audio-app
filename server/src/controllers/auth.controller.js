@@ -25,6 +25,24 @@ const signin = (req, res) => {
     })
 }
 
+const signinFacebookUser = (req, res) => {
+    User.findOne({'loggedWithFacebook': true},(err, user) => {
+        if(err || !user){
+            return res.send({error: 'User not found'})
+        }
+        const token = jwt.sign({_id: user._id, name:user.name}, config.secret)
+        res.cookie('userJwtToken', token, {expire: new Date()+999, httpOnly:true})
+        res.send({
+                _id:user._id, 
+                name: user.name, 
+                username: user.username,
+                favorites:user.favorites,
+                sessions:user.sessions,
+                mindfullMinutes:user.mindfullMinutes 
+        })
+    })
+}
+
 const signout = (req, res) => {
     res.clearCookie('userJwtToken')
     res.send({message:'User signed out'})
@@ -45,6 +63,6 @@ const hasAuthorization = (req, res, next) => {
     next()
 }
 
-export default {signin, signout, hasAuthorization, requireSignin}
+export default {signin, signout, hasAuthorization, requireSignin, signinFacebookUser}
 
 

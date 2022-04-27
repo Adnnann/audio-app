@@ -105,7 +105,6 @@ console.log(req.body)
                 if(err){
                     return res.send({error:'error'})
                 }else{
-                    console.log(user.favorites)
                     return res.send({
                         message:"Favorites updated",
                         data: user.favorites
@@ -198,7 +197,6 @@ const userByID = (req, res, next, id) => {
 const updateLongestDayStreak = (req, res, next) => {
     User.findById({_id:req.body.id}, (err, user)=>{
     
-        console.log(req.body.streak)
         user.dayStreak = req.body.streak
         user.longestStreak = req.body.longestStreak
 

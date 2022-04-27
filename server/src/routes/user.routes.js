@@ -5,16 +5,6 @@ require('../middleware/passport')
 
 const router = express.Router()
 
-router.get('/protected', passport.authenticate('jwt', { session: false }),
-    (req, res) => {
-        if(req.cookies.userJwtToken){
-            res.send(
-               JSON.stringify({message: req.cookies.userJwtToken})
-            )
-        }
-    }
-)
-
 router.route('/api/users/')
 .post(userCtrl.create)
 

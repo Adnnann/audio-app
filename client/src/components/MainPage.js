@@ -5,7 +5,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useState } from "react";
 import Item from "@material-ui/core/Grid"
 import { useDispatch } from "react-redux";
-import { getAllFiles, getUserProfile, setFile } from "../features/meditationSlice";
+import { fbLogin, getAllFiles, getUserProfile, setFile } from "../features/meditationSlice";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@mui/material";
 import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
@@ -42,14 +42,14 @@ const [favoriteFilter, setFavoriteFilter] = useState(false)
 
 useEffect(()=>{
         //check if user token exists. 
-       dispatch(userToken())
+        dispatch(userToken())
         //redirect user in case token doesn't exist
         if(token === 'Request failed with status code 500'
         || token ==='Request failed with status code 401'){
         dispatch(resetStore())
         navigate('/') 
         }
-  
+      
     },[token.length])
 
 
