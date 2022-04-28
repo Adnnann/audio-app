@@ -90,7 +90,7 @@ const updateUserPassword = async(req, res, next) => {
 }
 
 const updateFavorite = (req, res, next) => {
-console.log(req.body)
+
     User.findById({_id:req.body.id}, (err, user)=>{
 
         if(user.favorites.includes(req.body.favorites)){
@@ -113,7 +113,6 @@ console.log(req.body)
             })
         
         }else{
-            console.log('here')
             User.findOneAndUpdate(
                 {_id: req.body.id},
                 {$push: {favorites:req.body.favorites}}

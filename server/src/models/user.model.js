@@ -22,7 +22,6 @@ const UserSchema = new mongoose.Schema({
     email:{
         type:String,
         validate: emailValidate
-
     },
     updated: Date,
     hashed_password:{

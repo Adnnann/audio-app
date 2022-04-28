@@ -59,12 +59,18 @@ const useStyles = makeStyles(theme=>({
     progressBar:{
         marginLeft:'12px', 
         marginRight:'12px', 
-        width:'60%'
+        width:'60%',
+        [theme.breakpoints.only('xs')]:{
+          width:'40%'
+        }
     },
     volumeContainer:{
       width:'20%', 
       margin:'0 auto', 
-      marginTop:'40px'
+      marginTop:'40px',
+      [theme.breakpoints.only('xs')]:{
+        width:'40%'
+      }
     },
     volumeAdjuster:{
         marginTop: "5px",
@@ -107,7 +113,6 @@ useEffect(()=>{
         }
 
         if(addToFavorite?.message){
-          console.log('test')
           dispatch(fetchUserProfile(userProfile._id))
           dispatch(clearUserFavoriteList())
         }

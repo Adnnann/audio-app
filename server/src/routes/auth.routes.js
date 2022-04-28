@@ -9,6 +9,9 @@ router.route('/auth/signin')
 router.route('/auth/signinFacebookUser')
 .get(authCtrl.signinFacebookUser)
 
+router.route('/auth/updateFacebookUserStatus')
+.put(authCtrl.changeStatusOfFacebookUser)
+
 router.route('/auth/signout')
 .post(authCtrl.signout)
 

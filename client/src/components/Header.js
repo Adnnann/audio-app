@@ -14,8 +14,9 @@ import { useState } from "react";
 import Logo from '../assets/images/logo.jpeg'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser}  from '@fortawesome/free-solid-svg-icons'
-import { fbLogin, getUserToken, fetchFiles } from "../features/meditationSlice";
+import { fbLogin, getUserToken, fetchFiles, updateUserFacebookStatus, userToken, getUserProfile } from "../features/meditationSlice";
 import { useEffect } from "react";
+import UserProfile from "./UserProfile";
 
 const useStyles = makeStyles(theme=>({
     header:{
@@ -57,6 +58,8 @@ const Header = () => {
     if(window.location.hash === '#_=_'){
       dispatch(fbLogin()) 
       dispatch(fetchFiles())
+      dispatch(updateUserFacebookStatus())
+      dispatch(userToken())
       navigate('/musicLibrary') 
     }
   }, [])
@@ -65,6 +68,7 @@ const Header = () => {
   const navigate = useNavigate()
 
   const token = useSelector(getUserToken)
+  const userProfile = useSelector(getUserProfile)
   
   const login = () => {
     navigate('/login')
@@ -90,8 +94,9 @@ const Header = () => {
                 || window.location.pathname === '/signin' 
                 || window.location.pathname === '/signup' ? 64 : 38,
                 }}
-                alt="Expense tracker"
+                alt="Meditation app"
                 src={Logo}
+                onClick={()=>navigate('/')}
             />
           </Item>
           </Grid> 
@@ -101,7 +106,7 @@ const Header = () => {
             <Item>
             
               {
-              token?.message ? <FontAwesomeIcon 
+              token?.message || Object.keys(userProfile).length !== 0 ? <FontAwesomeIcon 
               onClick={()=>navigate('/userProfile')}
               icon={faUser} 
               className={classes.userIcon}
@@ -120,16 +125,6 @@ const Header = () => {
 
         </Toolbar>
 
-        {/* { 
-                Object.keys(displayUserName).length !== 0 ?
-                    <Typography variant="h6" className={classes.welcomeMessage}>
-                       {dateFormat(date, 'dddd, dd mmmm')}
-                        <br />
-                        Hello, {
-                         displayUserName.user.firstName}
-                    </Typography>
-                : null
-        } */}
 
     </AppBar>
     )

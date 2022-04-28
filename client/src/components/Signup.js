@@ -111,8 +111,8 @@ const Signup = () =>{
         console.log(response);
       }
 
-    const FBSignup = () => {
-        dispatch(fbLogin())
+    const loginWithFB  = () => {
+        window.open('http://localhost:5000/auth/facebook/callback','_self')
     }
  
     return(
@@ -183,14 +183,15 @@ const Signup = () =>{
             </CardActions>
 
             <CardActions>
-                <a 
-                href="http://localhost:5000/auth/facebook/callback"
+                <Button 
+                //href="http://localhost:5000/auth/facebook/callback"
                 className={classes.submit} 
                 color='primary' 
                 variant="contained" 
+                onClick={loginWithFB}
                 >
                     Sign in with Facebook
-                </a>
+                </Button>
             </CardActions>
 
         </Box>

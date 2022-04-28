@@ -43,9 +43,14 @@ const [favoriteFilter, setFavoriteFilter] = useState(false)
 useEffect(()=>{
         //check if user token exists. 
         dispatch(userToken())
+
+        if(allFiles?.files){
+            return
+        }
+
         //redirect user in case token doesn't exist
-        if(token === 'Request failed with status code 500'
-        || token ==='Request failed with status code 401'){
+        if((token === 'Request failed with status code 500'
+        || token ==='Request failed with status code 401')){
         dispatch(resetStore())
         navigate('/') 
         }

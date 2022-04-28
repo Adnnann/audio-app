@@ -126,7 +126,6 @@ const AccountDetails = () => {
             username: values.username === userProfile.username ? undefined : values.username
             }
         }
-        console.log(userToEdit)
         dispatch(updateUserProfile(userToEdit))    
     }
 

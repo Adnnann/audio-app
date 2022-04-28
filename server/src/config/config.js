@@ -9,7 +9,7 @@ const config = {
     mongoUri: process.env.MONGO_URI || `mongodb+srv://aovcina:${password}@cluster0.hbhrs.mongodb.net/${database}?retryWrites=true&w=majority`,
     FBClientID: process.env.CLIENTID,
     FBClientSecret:  process.env.CLIENTSECRET,
-    FBcallbackURL:  'http://localhost:5000/facebook/callback'
+    FBcallbackURL:  '/auth/facebook/callback'
 }
 
 

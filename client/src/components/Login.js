@@ -103,6 +103,10 @@ const useStyles = makeStyles(theme=>({
         const redirectToSignup = () => {
             navigate('/signup')
         }
+
+        const loginWithFB  = () => {
+            window.open('http://localhost:5000/auth/facebook/callback','_self')
+        }
     
         return(
 
@@ -171,7 +175,11 @@ const useStyles = makeStyles(theme=>({
                 </CardActions>
 
                 <CardActions>
-                    <Button className={classes.submit} color='primary' variant="contained" onClick={clickSubmit}>
+                    <Button 
+                    className={classes.submit} 
+                    color='primary' 
+                    variant="contained" 
+                    onClick={loginWithFB}>
                         Sign in with Facebook
                     </Button>
                 </CardActions>

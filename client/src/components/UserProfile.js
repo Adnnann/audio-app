@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router"
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ReplayIcon from "@mui/icons-material/Replay";
-import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
+import { getUserToken, userToken, resetStore, getUserProfile } from "../features/meditationSlice"
 import { useSelector } from "react-redux"
 import { useEffect } from "react";
 
@@ -84,6 +84,7 @@ const UserProfile = () =>{
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const token = useSelector(getUserToken)
+    const userProfile = useSelector(getUserProfile)
     
     useEffect(()=>{
             //check if user token exists. 
@@ -123,7 +124,9 @@ const UserProfile = () =>{
                         Account details
                     </Button>
                     <br />
-
+                    
+                    {!userProfile?.facebookId && (
+                        <>
                     <Button 
                     endIcon={<ArrowForwardIosIcon 
                     className={classes.changePasswordButtonIcon} />} 
@@ -131,7 +134,10 @@ const UserProfile = () =>{
                     onClick={()=>navigate('/changePassword')}>
                         Change Password
                     </Button>
+
                     <br />
+                    </>)
+                    }
 
                     <Button 
                     endIcon={<ArrowForwardIosIcon 

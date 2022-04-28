@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.routes'
 import strategy from "passport-facebook";
 import User from "./models/user.model";
+import config from './config/config'
 
 const FacebookStrategy = strategy.Strategy;
 
@@ -23,24 +24,13 @@ app.use(cors())
 app.use(helmet())
 app.use(cookieParser())
 app.use(passport.initialize())
-// app.use(passport.session())
-
-// passport.serializeUser((user, done)=>{
-//     done(null, user)
-// })
-
-// passport.deserializeUser((user, done)=>{
-//     done(null, user)
-// })
-
-
 
   passport.use(
     new FacebookStrategy(
       {
-        clientID: '994509227860871',
-        clientSecret: '6abf0586c6c1f343883cb2a3dc1546a4',
-        callbackURL: '/auth/facebook/callback',
+        clientID: config.FBClientID,
+        clientSecret: config.FBClientSecret,
+        callbackURL: config.FBcallbackURL,
         profileFields: ["email", "name"],
       },
 
@@ -53,12 +43,12 @@ app.use(passport.initialize())
           password:profile.id,
           loggedWithFacebook:true
         };
- 
+
         const user =  await User.findOne({'facebookId':userData.facebookId})
         if(!user){
           await new User(userData).save();
         }else{
-            console.log(user)
+            await User.findOneAndUpdate({'facebookId':userData.facebookId}, {loggedWithFacebook:true})
         }
 
         return done(null, profile);

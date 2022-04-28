@@ -36,11 +36,26 @@ const signinFacebookUser = (req, res) => {
                 _id:user._id, 
                 name: user.name, 
                 username: user.username,
+                email:user.email,
                 favorites:user.favorites,
                 sessions:user.sessions,
-                mindfullMinutes:user.mindfullMinutes 
+                mindfulMinutes:user.mindfulMinutes,
+                dayStreak: user.dayStreak,
+                longestStreak: user.longestStreak
         })
     })
+}
+
+const changeStatusOfFacebookUser = async (req, res) => {
+    const user = await User.findOneAndUpdate({loggedWithFacebook:true}, {loggedWithFacebook:false})
+
+    if(user){
+        res.send({message:"Status changed"}) 
+    }else{
+        res.send({error:"Error"}) 
+    }
+   
+    
 }
 
 const signout = (req, res) => {
@@ -63,6 +78,6 @@ const hasAuthorization = (req, res, next) => {
     next()
 }
 
-export default {signin, signout, hasAuthorization, requireSignin, signinFacebookUser}
+export default {signin, signout, hasAuthorization, requireSignin, signinFacebookUser, changeStatusOfFacebookUser}
 
 

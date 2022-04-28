@@ -79,6 +79,17 @@ export const updateUserProfile = createAsyncThunk('meditation/updateProfile', as
   .catch(error=>error)
 })
 
+export const updateUserFacebookStatus = createAsyncThunk('meditation/facebookUserStatus', async()=>{
+  return await axios.put(`/auth/updateFacebookUserStatus`, {
+    header:{
+      'Accept':'application/json',
+      'Content-Type':'application/json'
+    }
+  })
+  .then(response=>response.data)
+  .catch(error=>error)
+})
+
 export const updateFavoriteList = createAsyncThunk('meditation/updatedFavorite', async(editedUser)=>{
     return await axios.put(`/api/users/updateFavorite/${editedUser.param}`, editedUser.data, {
       header:{
@@ -161,6 +172,7 @@ const initialState = {
     updatePassword:{},
     updateProfile:{},
     fbLoginData:{},
+    facebookUserStatus:{},
     //audio files
     file:'',
     allFiles:{},
@@ -252,7 +264,11 @@ export const meditationSlice = createSlice({
           return {...state, userProfile:payload}
         },
         [fetchFBUserProfile.fulfilled]:(state,{payload})=>{
-          state.userProfile = payload
+          return {...state, userProfile:payload}
+        },
+        [updateUserFacebookStatus.fulfilled]: (state, {payload})=>{
+          return {...state, facebookUserStatus:payload}
+          
         }
     }
 })
