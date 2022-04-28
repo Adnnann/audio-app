@@ -15,6 +15,9 @@ router.route('/auth/updateFacebookUserStatus')
 router.route('/auth/signout')
 .post(authCtrl.signout)
 
+router.route('/auth/deleteAssignedPassword')
+.post(authCtrl.deleteAssignedPassword)
+
 
 router.get("/auth/facebook", 
 passport.authenticate("facebook",
@@ -23,8 +26,8 @@ scope: ['email', 'manage_pages']}))
 
 router.get("/auth/facebook/callback",
 passport.authenticate("facebook", {
-    successRedirect: "http://localhost:3000/musicLibrary",
-    failureRedirect: "http://localhost:3000/musicLibrary",
+    successRedirect: "http://localhost:3000/login",
+    failureRedirect: "http://localhost:3000/login",
     session : false 
     })
 )

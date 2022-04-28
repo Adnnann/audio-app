@@ -53,21 +53,16 @@ const useStyles = makeStyles(theme=>({
 const Header = () => {
 
   const dispatch = useDispatch()
+  const token = useSelector(getUserToken)
 
   useEffect(() => {
-    if(window.location.hash === '#_=_'){
-      dispatch(fbLogin()) 
-      dispatch(fetchFiles())
-      dispatch(updateUserFacebookStatus())
-      dispatch(userToken())
-      navigate('/musicLibrary') 
-    }
-  }, [])
+  
+
+  }, [token.length])
 
   const classes = useStyles()
   const navigate = useNavigate()
 
-  const token = useSelector(getUserToken)
   const userProfile = useSelector(getUserProfile)
   
   const login = () => {

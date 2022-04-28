@@ -1,28 +1,23 @@
 import React, {useEffect, useState} from "react"
-import Card from '@material-ui/core/Card'
-import CardActions from "@material-ui/core/CardActions"
-import CardContent from "@material-ui/core/CardContent"
-import Button from '@material-ui/core/Button'
-import Box from '@material-ui/core/Box'
-import TextField from "@material-ui/core/TextField"
-import Typography from "@material-ui/core/Typography"
-import Icon from "@material-ui/core/Icon"
-import Grid from "@material-ui/core/Grid"
+
+// import CardContent from "@material-ui/core/CardContent"
+// import Button from '@material-ui/core/Button'
+// import Box from '@material-ui/core/Box'
+// import TextField from "@material-ui/core/TextField"
+// import Typography from "@material-ui/core/Typography"
+// import Icon from "@material-ui/core/Icon"
+// import Grid from "@material-ui/core/Grid"
 import { makeStyles } from "@material-ui/core"
-import Dialog from "@material-ui/core/Dialog"
-import DialogActions from "@material-ui/core/DialogActions"
-import DialogContent from "@material-ui/core/DialogContent"
-import DialogContentText from "@material-ui/core/DialogContentText"
-import DialogTitle from "@material-ui/core/DialogTitle"
 import {  useDispatch } from 'react-redux';
 import {
+    clearUserProfile,
         createUser,
-        fbLogin,
         getUserProfile
 } from "../features/meditationSlice"
 import { useNavigate } from "react-router"
 import { useSelector } from "react-redux"
-import FacebookLogin from 'react-facebook-login';
+import { CardActions,CardContent,Button,Box,TextField,Typography, Icon, Grid } from "@material-ui/core"
+
 
 const useStyles = makeStyles(theme=>({
     container: {
@@ -88,6 +83,7 @@ const Signup = () =>{
     useEffect(()=>{
         if(userData?.message && !userData.message.includes('failed')){
           navigate('/login')
+          dispatch(clearUserProfile())
         }
       },[userData])
 
@@ -106,10 +102,6 @@ const Signup = () =>{
         dispatch(createUser(user))
        
     }
-
-    const responseFacebook = (response) => {
-        console.log(response);
-      }
 
     const loginWithFB  = () => {
         window.open('http://localhost:5000/auth/facebook/callback','_self')

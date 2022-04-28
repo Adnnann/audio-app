@@ -125,8 +125,6 @@ const UserProfile = () =>{
                     </Button>
                     <br />
                     
-                    {!userProfile?.facebookId && (
-                        <>
                     <Button 
                     endIcon={<ArrowForwardIosIcon 
                     className={classes.changePasswordButtonIcon} />} 
@@ -134,11 +132,8 @@ const UserProfile = () =>{
                     onClick={()=>navigate('/changePassword')}>
                         Change Password
                     </Button>
-
                     <br />
-                    </>)
-                    }
-
+                 
                     <Button 
                     endIcon={<ArrowForwardIosIcon 
                     className={classes.myStatsButtonIcon}/>} 

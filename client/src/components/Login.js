@@ -7,7 +7,7 @@ import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
 import Icon from "@material-ui/core/Icon"
 import { makeStyles } from "@material-ui/core"
-import { loginUser, getUserSigninData, fetchUserProfile, fetchFiles} from "../features/meditationSlice"
+import { loginUser, getUserSigninData, fetchUserProfile, fetchFiles, fbLogin, updateUserFacebookStatus, getUserProfile, getUpdateUserFacebookStatus, userToken, clearUpdateFacebookUserStatus} from "../features/meditationSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router"
 import { useEffect } from "react"
@@ -71,20 +71,39 @@ const useStyles = makeStyles(theme=>({
         const dispatch = useDispatch()
         const navigate = useNavigate()
         const userSigninData = useSelector(getUserSigninData)
-        
+        const userProfile = useSelector(getUserProfile)
+        const userFacebookStatus = useSelector(getUpdateUserFacebookStatus)
+ 
         const [values, setValues] = useState({
             email:'',
             password:'',
         })
-    
+
+        
         //if user has token (is logged) redirected to protected page
         useEffect(()=>{
-            if(userSigninData.hasOwnProperty('token')){
+            if(userSigninData.hasOwnProperty('token') ){
               dispatch(fetchUserProfile(userSigninData.user._id))
               dispatch(fetchFiles())
               navigate('/musicLibrary')
             }
-          },[userSigninData])
+
+            if(userFacebookStatus?.message){
+                dispatch(clearUpdateFacebookUserStatus())
+                navigate('/musicLibrary')   
+            }
+
+            if(Object.keys(userFacebookStatus).length !== 0){
+                return
+            }else{
+                if(window.location.hash === '#_=_'){
+                    dispatch(fbLogin()) 
+                    dispatch(fetchFiles())
+                    dispatch(updateUserFacebookStatus())
+                  }
+            }
+
+          },[userSigninData, userFacebookStatus])
     
         // send request to server to login user and in case there are errors collect error
         const clickSubmit = () => {
@@ -98,10 +117,6 @@ const useStyles = makeStyles(theme=>({
         // get values from input fields
         const handleChange = name => event => {
             setValues({...values, [name]: event.target.value})
-        }
-
-        const redirectToSignup = () => {
-            navigate('/signup')
         }
 
         const loginWithFB  = () => {

@@ -26,38 +26,56 @@ app.use(cookieParser())
 app.use(passport.initialize())
 
 {
-  config.FBClientID  ?
+  config.FBClientID && config.FBClientSecret  ?
   passport.use(
     new FacebookStrategy(
       {
         clientID: config.FBClientID,
         clientSecret: config.FBClientSecret,
-        callbackURL: config.FBcallbackURL,
+        callbackURL: '/auth/facebook/callback',
         profileFields: ["email", "name"],
       },
 
      async function(accessToken, refreshToken, profile, done) {
 
+      const initArray = []
+
+      for(let i=0; i<100;i++){
+        initArray.push(i)
+      }
+
+      const passwordArr = []
+
+      for(let i=0; i<8;i++){
+        passwordArr.push(initArray[Math.floor(Math.random()*100)])
+      }
+
+      const assignedPassword = passwordArr.join('')
+     
         const userData = {
         facebookId:profile.id,
           email: profile._json.email,
           username: profile._json.first_name+" "+profile._json.last_name,
-          password:profile.id,
-          loggedWithFacebook:true
+          password:'FB@'+assignedPassword ,
+          loggedWithFacebook:true,
+          assignedPassword: 'FB@'+assignedPassword,
+          changePasswordInfo: 'no'
         };
 
-        const user =  await User.findOne({'facebookId':userData.facebookId})
+        const user = await User.findOne({'facebookId':userData.facebookId})
         if(!user){
           await new User(userData).save();
         }else{
-            await User.findOneAndUpdate({'facebookId':userData.facebookId}, {loggedWithFacebook:true})
+          await User.findOneAndUpdate({'facebookId':userData.facebookId}, {loggedWithFacebook:true})
         }
 
         return done(null, profile);
      }
         
     )
-  ) : null
+  ) : app.use("/auth/facebook/callback",(req,res) => {
+    res.redirect('http://localhost:3000/error')
+  })
 }
   
 

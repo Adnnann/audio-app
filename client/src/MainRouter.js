@@ -11,6 +11,7 @@ import UserStats from "./components/UserStats";
 import Logout from "./components/Logout";
 import MainPage from "./components/MainPage";
 import Player from "./components/AudioPlayer";
+import ErrorPage from "./components/ErrorPage";
 const MainRouter = () => {
     return(
         <Router>
@@ -27,6 +28,7 @@ const MainRouter = () => {
                 <Route path="/logout" element={<Logout />}></Route>
                 <Route path="/musicLibrary" element={<MainPage />}></Route>
                 <Route path="/playFile" element={<Player />}></Route>
+                <Route path="/error" element={<ErrorPage />}></Route>
             </Routes>
         </Router>
     )

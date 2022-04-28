@@ -46,7 +46,7 @@ export const fetchUserProfile = createAsyncThunk('meditation/userProfile', async
 })
 
 export const fetchFBUserProfile = createAsyncThunk('meditation/userProfile', async(param)=>{
-  return await axios.get(`/api/users/${param}`, {
+  return await axios.get(`/api/users/facebookProfile/${param}`, {
     header:{
       'Accept':'application/json',
       'Content-Type':'application/json'
@@ -81,6 +81,17 @@ export const updateUserProfile = createAsyncThunk('meditation/updateProfile', as
 
 export const updateUserFacebookStatus = createAsyncThunk('meditation/facebookUserStatus', async()=>{
   return await axios.put(`/auth/updateFacebookUserStatus`, {
+    header:{
+      'Accept':'application/json',
+      'Content-Type':'application/json'
+    }
+  })
+  .then(response=>response.data)
+  .catch(error=>error)
+})
+
+export const deleteFBAssignedPassword = createAsyncThunk('meditation/assignedPassword', async(user)=>{
+  return await axios.post(`/auth/deleteAssignedPassword`, user.data, {
     header:{
       'Accept':'application/json',
       'Content-Type':'application/json'
@@ -173,6 +184,7 @@ const initialState = {
     updateProfile:{},
     fbLoginData:{},
     facebookUserStatus:{},
+    assignedPassword:{},
     //audio files
     file:'',
     allFiles:{},
@@ -219,6 +231,15 @@ export const meditationSlice = createSlice({
         },
         clearUpdateUserProfile:(state, action) => {
           state.updateProfile = {}
+        },
+        clearUpdateFacebookUserStatus:(state, action) => {
+          state.updateUserFacebookStatus = {}
+        },
+        clearUserProfile:(state, action) =>{
+          state.userProfile ={}
+        },
+        clearAssignedPasswordStatus:(state, action) =>{
+          state.assignedPassword ={}
         },
         resetStore:()=> initialState
     },
@@ -267,9 +288,11 @@ export const meditationSlice = createSlice({
           return {...state, userProfile:payload}
         },
         [updateUserFacebookStatus.fulfilled]: (state, {payload})=>{
-          return {...state, facebookUserStatus:payload}
-          
-        }
+          return {...state, facebookUserStatus:payload} 
+        },
+        [deleteFBAssignedPassword.fulfilled]: (state, {payload})=>{
+          return {...state, assignedPassword:payload} 
+        },
     }
 })
 
@@ -289,7 +312,10 @@ export const {
     clearMindfulMinutes,
     clearStreak,
     clearUpdatePassword,
-    clearUpdateUserProfile
+    clearUpdateUserProfile,
+    clearUpdateFacebookUserStatus,
+    clearUserProfile,
+    clearAssignedPasswordStatus
 } = meditationSlice.actions
 
 export const getCreatedUser = (state) => state.meditation.createdUser
@@ -301,6 +327,8 @@ export const getEditedUserStatus = (state) => state.meditation.editedUserData
 export const getUserProfile = (state) => state.meditation.userProfile
 export const getUserPassword = (state) => state.meditation.updatePassword
 export const getUpdateUserProfile = (state) => state.meditation.updateProfile
+export const getUpdateUserFacebookStatus = (state) => state.meditation.facebookUserStatus
+export const getAssigneduserPassword = (state) => state.meditation.assignedPassword
 //files
 export const getFile = (state) => state.meditation.file
 export const getUpdatedFavorite = (state) => state.meditation.updatedFavorite

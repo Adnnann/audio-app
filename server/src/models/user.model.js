@@ -51,6 +51,12 @@ const UserSchema = new mongoose.Schema({
     loggedWithFacebook:{
         type:Boolean
     },
+    assignedPassword:{
+        type:String
+    },
+    changePasswordInfo:{
+        type:String
+    },
     salt:String
 })
 

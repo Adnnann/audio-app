@@ -42,13 +42,28 @@ const signinFacebookUser = (req, res) => {
                 mindfulMinutes:user.mindfulMinutes,
                 dayStreak: user.dayStreak,
                 longestStreak: user.longestStreak,
-                facebookId:user.facebookId
+                facebookId:user.facebookId,
+                assignedPassword:user.assignedPassword,
+                changePasswordInfo:user.changePasswordInfo
         })
     })
 }
 
+const deleteAssignedPassword = async(req, res) => {
+    const user = await User.findOneAndUpdate({assignedPassword:req.body.assignedPassword}, 
+        {$set: {assignedPassword:'', changePasswordInfo:'yes'}})
+    if(user){
+        res.send({message:"Status changed"}) 
+    }else{
+        res.send({error:"Error"}) 
+    }
+   
+    
+}
+
 const changeStatusOfFacebookUser = async (req, res) => {
-    const user = await User.findOneAndUpdate({loggedWithFacebook:true}, {loggedWithFacebook:false})
+    const user = await User.findOneAndUpdate({loggedWithFacebook:true}, 
+        {loggedWithFacebook:false})
 
     if(user){
         res.send({message:"Status changed"}) 
@@ -79,6 +94,14 @@ const hasAuthorization = (req, res, next) => {
     next()
 }
 
-export default {signin, signout, hasAuthorization, requireSignin, signinFacebookUser, changeStatusOfFacebookUser}
+export default {
+    signin, 
+    signout, 
+    hasAuthorization, 
+    requireSignin, 
+    signinFacebookUser, 
+    changeStatusOfFacebookUser,
+    deleteAssignedPassword
+}
 
 

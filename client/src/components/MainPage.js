@@ -5,12 +5,19 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useState } from "react";
 import Item from "@material-ui/core/Grid"
 import { useDispatch } from "react-redux";
-import { fbLogin, getAllFiles, getUserProfile, setFile } from "../features/meditationSlice";
+import { clearAssignedPasswordStatus, deleteFBAssignedPassword,  
+         fetchFBUserProfile,  
+         getAllFiles, 
+         getAssigneduserPassword, 
+         getUserProfile, 
+         setFile 
+} from "../features/meditationSlice";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@mui/material";
 import { getUserToken, userToken, resetStore } from "../features/meditationSlice"
 import { useSelector } from "react-redux"
 import { useEffect } from "react";
+import { Dialog,DialogContent,DialogContentText,DialogActions } from "@mui/material";
 
 const useStyles = makeStyles(theme=>({
     buttons:{
@@ -39,23 +46,27 @@ const token = useSelector(getUserToken)
 const allFiles = useSelector(getAllFiles)
 const favorites = useSelector(getUserProfile).favorites
 const [favoriteFilter, setFavoriteFilter] = useState(false)
+const [changePasswordNotification, setChangePasswordNotification] = useState(true)
+const userProfile = useSelector(getUserProfile)
+const assignedPassword = useSelector(getAssigneduserPassword)
 
 useEffect(()=>{
-        //check if user token exists. 
-        dispatch(userToken())
+        
+    dispatch(userToken())
+        
+    //redirect user in case token doesn't exist
+    if((token === 'Request failed with status code 500'
+    || token ==='Request failed with status code 401')){
+    dispatch(resetStore())
+    navigate('/') 
+    }
 
-        if(allFiles?.files){
-            return
-        }
-
-        //redirect user in case token doesn't exist
-        if((token === 'Request failed with status code 500'
-        || token ==='Request failed with status code 401')){
-        dispatch(resetStore())
-        navigate('/') 
-        }
+    if(assignedPassword?.message){
+        dispatch(fetchFBUserProfile(userProfile._id))
+        dispatch(clearAssignedPasswordStatus())
+    }
       
-    },[token.length])
+    },[token.length, assignedPassword])
 
 
     const [button, setButton] = useState({
@@ -174,14 +185,25 @@ useEffect(()=>{
         navigate('/playFile')  
     }
 
+    const setInformPasswordChangeStatus = () => {
+        setChangePasswordNotification(false)
+
+        const user = {
+            data:{assignedPassword:userProfile.assignedPassword}
+        }
+    
+        dispatch(deleteFBAssignedPassword(user))
+    }
+
     return(
 
     
         
         <Grid container>
 
-        {Object.keys(allFiles).length !== 0 ?
-<>
+        {
+        Object.keys(allFiles).length !== 0 ?
+        <>
             <Grid item xs={12} md={12} lg={12} xl={12}>
 
   
@@ -522,6 +544,24 @@ useEffect(()=>{
         </Grid>
         </>
        : null }    
+
+       <Dialog open={
+                userProfile?.assignedPassword 
+                && userProfile.changePasswordInfo === 'no'
+                && changePasswordNotification 
+                ? true : false
+                }>
+                <DialogContent>
+                    <DialogContentText>
+                       Your password is set to {userProfile.assignedPassword} to enable you to login
+                       without Facebook. We strongly recommend that you change your password 
+                       as soon as possible
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                        <Button color="primary" onClick={setInformPasswordChangeStatus}>Close</Button>
+                </DialogActions>
+            </Dialog>
     </Grid>
     )
 

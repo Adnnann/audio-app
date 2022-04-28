@@ -12,6 +12,9 @@ router.route('/api/users/:userId')
 .get(userCtrl.read)
 .delete(userCtrl.remove)
 
+router.route('/api/users/facebookProfile/:userId')
+.get(userCtrl.read)
+
 router.route('/api/users/updateFavorite/:userId')
 .put(userCtrl.updateFavorite)
 

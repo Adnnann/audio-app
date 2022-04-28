@@ -69,7 +69,8 @@ const UserStats = () => {
    
     return(
         <Grid container className={classes.container} justifyContent='center'>
-
+{Object.keys(userProfile).length !== 0 ?
+<>
             <Button 
             startIcon={<ArrowBackIosNewIcon 
             onClick={()=>navigate('/userProfile')}/>} 
@@ -186,7 +187,8 @@ const UserStats = () => {
                 </Grid>   
             
             </Grid>
-       
+        </>
+       :null}
         </Grid>
     )
 }
