@@ -15,6 +15,7 @@ router.route('/auth/updateFacebookUserStatus')
 router.route('/auth/signout')
 .post(authCtrl.signout)
 
+
 router.get("/auth/facebook", 
 passport.authenticate("facebook",
 {authType: 'reauthenticate', 
@@ -26,7 +27,8 @@ passport.authenticate("facebook", {
     failureRedirect: "http://localhost:3000/musicLibrary",
     session : false 
     })
-);
+)
+
    
 router.get('/protected', passport.authenticate('jwt', { session: false }),
     (req, res) => {

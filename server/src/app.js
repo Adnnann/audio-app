@@ -25,6 +25,8 @@ app.use(helmet())
 app.use(cookieParser())
 app.use(passport.initialize())
 
+{
+  config.FBClientID  ?
   passport.use(
     new FacebookStrategy(
       {
@@ -55,7 +57,9 @@ app.use(passport.initialize())
      }
         
     )
-  );
+  ) : null
+}
+  
 
 
 
