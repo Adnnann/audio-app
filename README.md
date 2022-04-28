@@ -16,6 +16,8 @@ fileTitle_fileCategory_fileLength_fileType(audio - mp3 images - jpeg)
 
 Saving files with above naming convention is enabling filtering and all other available actions on the app (file name string is used for all data manipulation)
 
+User loged with FB will not be able to change password but can change his email and username
+
 ## Important
 
 To use app user has to store following data in .env on server
