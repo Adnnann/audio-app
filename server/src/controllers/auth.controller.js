@@ -41,7 +41,8 @@ const signinFacebookUser = (req, res) => {
                 sessions:user.sessions,
                 mindfulMinutes:user.mindfulMinutes,
                 dayStreak: user.dayStreak,
-                longestStreak: user.longestStreak
+                longestStreak: user.longestStreak,
+                facebookId:user.facebookId
         })
     })
 }
