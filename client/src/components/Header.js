@@ -106,7 +106,7 @@ const Header = () => {
             <Item>
             
               {
-              token?.message || Object.keys(userProfile).length !== 0 ? <FontAwesomeIcon 
+              token?.message || userProfile?.username ? <FontAwesomeIcon 
               onClick={()=>navigate('/userProfile')}
               icon={faUser} 
               className={classes.userIcon}
