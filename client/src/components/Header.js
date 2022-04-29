@@ -54,6 +54,7 @@ const Header = () => {
 
   const dispatch = useDispatch()
   const token = useSelector(getUserToken)
+  const userProfile = useSelector(getUserProfile)
 
   useEffect(() => {
   
@@ -63,7 +64,7 @@ const Header = () => {
   const classes = useStyles()
   const navigate = useNavigate()
 
-  const userProfile = useSelector(getUserProfile)
+
   
   const login = () => {
     navigate('/login')
@@ -73,6 +74,13 @@ const Header = () => {
     navigate('/signup')
   }
 
+  const redirectUser = () => {
+    if(userProfile?.username){
+      navigate('/musicLibrary')
+    }else{
+      navigate('/')
+    }
+  }
   
     return(
         
@@ -91,7 +99,7 @@ const Header = () => {
                 }}
                 alt="Meditation app"
                 src={Logo}
-                onClick={()=>navigate('/')}
+                onClick={redirectUser}
             />
           </Item>
           </Grid> 

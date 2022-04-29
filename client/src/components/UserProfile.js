@@ -53,7 +53,10 @@ const useStyles = makeStyles(theme=>({
         minWidth:'220px',
         minHeight:'50px',
         marginBottom:'10px',
-        marginLeft: '900px',
+        marginLeft: '20px',
+        [theme.breakpoints.only('lg')]:{
+            marginLeft:'900px',
+        },
         [theme.breakpoints.only('lg')]:{
             marginLeft:'600px',
         },
@@ -117,6 +120,7 @@ const UserProfile = () =>{
                     </Typography>
 
                     <Button 
+                    onClick={()=>navigate('/accountDetails')}
                     endIcon={<ArrowForwardIosIcon 
                     onClick={()=>navigate('/accountDetails')}
                     className={classes.accountDetailsButtonIcon}/>} 
