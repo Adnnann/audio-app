@@ -354,11 +354,11 @@ useEffect(()=>{
                 
                       <p className={classes.audioTime}>
                       {audioFile
-                      ? `${Math.floor(audioFile.currentTime / 60)}
+                      ? `0${Math.floor(audioFile.currentTime / 60)}
                         :
                         ${Math.round(audioFile.currentTime % 60) 
                         <10
-                        ?  Math.round(audioFile.currentTime % 60)
+                        ?  `0${Math.round(audioFile.currentTime % 60)}`
                         :  Math.round(audioFile.currentTime % 60)}`
                       : '00'}
                       </p>
@@ -373,9 +373,9 @@ useEffect(()=>{
                       
                       { //added && - check if it works
                         audioFile && audioFile.duration ?
-                      `${Math.floor(audioFile.duration / 60)} 
+                      `0${Math.floor(audioFile.duration / 60)} 
                        :
-                      ${Math.round(audioFile.duration % 60)}`
+                      0${Math.round(audioFile.duration % 60)}`
                         : "0:00"
                       }
                       </p>
