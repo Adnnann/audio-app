@@ -1,6 +1,7 @@
 # Description
 
-This is app that enables user to meditate by listening music.
+This is app that enables user to select and listen music
+.
 
 User can select login by signin up for the account and then loging in OR user can log in with his or her FB account.
 
