@@ -30,10 +30,13 @@ User can click on hearth icon to save favorite audio file. User is enabled to ch
 
 To use app user has to store following data in .env on server
 
-DATABASE==<Atlas MongoDB database name>
-PASSWORD=<Atlas MongoDB database password>
-CLIENTID=<Facebook login API CLIENT ID>
-CLIENTSECRET=<Facebook login API CLIENT SECRET>
+DATABASE=Atlas MongoDB database name
+<br />
+PASSWORD=Atlas MongoDB database password
+<br />
+CLIENTID=Facebook login API CLIENT ID
+<br />
+CLIENTSECRET=Facebook login API CLIENT SECRET
 
 ## UI
 
